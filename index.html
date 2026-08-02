@@ -13,7 +13,6 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* Disable default cursor */
         * { cursor: none !important; }
 
         body { 
@@ -25,7 +24,6 @@
             position: relative;
         }
 
-        /* --- BUBBLE CANVAS BACKGROUND --- */
         #bubble-canvas {
             position: fixed;
             top: 0;
@@ -33,10 +31,10 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 1; /* Sits behind content, above body background */
+            z-index: 1;
         }
 
-        /* --- HIGHEST Z-INDEX CURSOR --- */
+        /* --- neon cursor --- */
         .cursor-dot {
             width: 8px; height: 8px; background: var(--accent);
             position: fixed; border-radius: 50%; pointer-events: none;
@@ -48,10 +46,10 @@
             z-index: 200000; transition: transform 0.15s ease-out;
         }
 
-        /* The Haze State */
+        /* haze transition */
         body.hazy { background-color: #050505; color: #fff; }
 
-        /* --- NAVIGATION --- */
+        /* --- navigation --- */
         nav {
             position: fixed; top: 0; width: 100%; padding: 2rem 8%;
             display: flex; justify-content: space-between; align-items: center;
@@ -81,7 +79,7 @@
             color: #000 !important;
         }
 
-        /* Section Mechanics */
+        /* section mechanics */
         section {
             min-height: 100vh;
             display: flex; flex-direction: column;
@@ -89,7 +87,7 @@
             text-align: center; padding: 80px 8%;
             transition: opacity 0.6s ease, transform 0.8s ease;
             position: relative;
-            z-index: 2; /* Ensures text stays above canvas */
+            z-index: 2; /* text above canvas */
         }
 
         .reveal { opacity: 0; transform: translateY(80px); }
@@ -100,7 +98,7 @@
         h2 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
         p { max-width: 700px; font-size: 1.2rem; margin-top: 20px; opacity: 0.7; line-height: 1.6; }
 
-        /* Staggered Bento Layout */
+        /* stagerred Layout */
         .bento {
             display: flex;
             flex-direction: column;
@@ -149,7 +147,7 @@
             display: inline-block;
         }
 
-        /* Feature Card Grid (Hub Style) */
+        /* card grid */
         .hub-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -254,7 +252,7 @@
 
         footer { padding: 100px 0; text-align: center; border-top: 1px solid #222; position: relative; z-index: 2; }
 
-        /* --- INITIAL LOADING SCREEN --- */
+        /* --- load screen --- */
         #nebula-loading {
             position: fixed;
             inset: 0;
@@ -547,7 +545,7 @@
     </footer>
 
     <script>
-        /* Cursor Following */
+        /* cursor movement */
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
         window.addEventListener('mousemove', (e) => {
@@ -557,13 +555,13 @@
             outline.style.top = e.clientY - 16 + 'px';
         });
 
-        /* Expanded to include modal elements, inputs, and buttons */
+        /* button, input, card expansion */
         document.querySelectorAll('a, button, input, .hub-card').forEach(el => {
             el.addEventListener('mouseenter', () => outline.style.transform = 'scale(1.5)');
             el.addEventListener('mouseleave', () => outline.style.transform = 'scale(1)');
         });
 
-        /* Dynamic Glow Effect on Hover for Feature Cards */
+        /* card glow effect */
         document.querySelectorAll('.hub-card').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
@@ -574,75 +572,7 @@
             });
         });
 
-        /* --- BUBBLE CANVAS ENGINE --- */
-        const canvas = document.getElementById('bubble-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        let transitionProgress = 0; // 0 = Green, 1 = Red
-
-        class Bubble {
-            constructor() {
-                this.reset();
-                this.y = Math.random() * canvas.height; // Spread initially across height
-            }
-
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = canvas.height + Math.random() * 20;
-                this.radius = Math.random() * 12 + 4;
-                this.speed = Math.random() * 1.5 + 0.5;
-                this.opacity = Math.random() * 0.4 + 0.1;
-                this.wobble = Math.random() * Math.PI * 2;
-                this.wobbleSpeed = Math.random() * 0.03 + 0.01;
-            }
-
-            update() {
-                this.y -= this.speed;
-                this.wobble += this.wobbleSpeed;
-                this.x += Math.sin(this.wobble) * 0.5;
-
-                if (this.y < -this.radius) {
-                    this.reset();
-                }
-            }
-
-            draw() {
-                // Interpolate colors between Green (16, 185, 129) and Red (239, 68, 68)
-                const r = Math.round(16 + (239 - 16) * transitionProgress);
-                const g = Math.round(185 + (68 - 185) * transitionProgress);
-                const b = Math.round(129 + (68 - 129) * transitionProgress);
-
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.opacity})`;
-                ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${this.opacity + 0.2})`;
-                ctx.lineWidth = 1;
-                ctx.fill();
-                ctx.stroke();
-            }
-        }
-
-        const bubbleCount = 45;
-        const bubbles = Array.from({ length: bubbleCount }, () => new Bubble());
-
-        function animateBubbles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            bubbles.forEach(b => {
-                b.update();
-                b.draw();
-            });
-            requestAnimationFrame(animateBubbles);
-        }
-        animateBubbles();
-
-        /* Scroll reveal and Haze effect */
+        /* scroll and haze effect */
         const sections = document.querySelectorAll('section');
         let typingStarted = false;
 
@@ -650,7 +580,7 @@
             const scrollPos = window.scrollY;
             document.body.classList.toggle('hazy', scrollPos > 400);
 
-            // Calculate transition progress based on scroll threshold (0 to 400px)
+            /* calculate progression loading */
             transitionProgress = Math.min(Math.max(scrollPos / 400, 0), 1);
 
             sections.forEach(sec => {
@@ -673,7 +603,7 @@
             });
         });
 
-        /* Typing Animation Function with HTML Tag Parsing */
+        /* typing animation */
         function startAlternatingTyping() {
             const elements = document.querySelectorAll('.typed-text');
             
@@ -717,7 +647,7 @@
             });
         }
 
-        /* --- AUTHENTICATION --- */
+        /* --- authentication --- */
         const authNavBtn = document.getElementById('authNavBtn');
         const quizHubCard = document.getElementById('quizHubCard');
 
@@ -750,7 +680,7 @@
 
         checkAuthState();
 
-        /* --- INITIAL LOADING SCREEN LOGIC (runs on every index.html load) --- */
+        /* --- logic of loading screen --- */
         (function bootLoadingScreen() {
             const loader = document.getElementById('nebula-loading');
             const bar = document.getElementById('nebulaLoaderBar');
