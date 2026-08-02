@@ -1254,146 +1254,9 @@
             .pokedex-grid { grid-template-columns: 1fr; }
             .lb-row { grid-template-columns: 50px 1fr 100px 120px; padding: 12px 14px; }
         }
-
-        /* --- INITIAL LOADING SCREEN --- */
-        #nebula-loading {
-            position: fixed;
-            inset: 0;
-            z-index: 2147483647;
-            background: radial-gradient(ellipse at center, #0a1a14 0%, #05070a 55%, #030406 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 36px;
-            opacity: 1;
-            pointer-events: all;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-        #nebula-loading.loader-out {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        .nebula-loader-logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            letter-spacing: 14px;
-            font-size: clamp(1.8rem, 4.5vw, 3.2rem);
-            color: #fff;
-            position: relative;
-            padding-left: 14px;
-            animation: loaderLogoPulse 2.2s ease-in-out infinite;
-        }
-        .nebula-loader-logo span {
-            display: inline-block;
-            color: var(--accent);
-            text-shadow: 0 0 12px rgba(16, 185, 129, 0.55), 0 0 28px rgba(16, 185, 129, 0.25);
-        }
-        @keyframes loaderLogoPulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0)); }
-            50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.45)); }
-        }
-        .nebula-loader-tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            letter-spacing: 6px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: -18px;
-        }
-        .nebula-loader-bar-wrap {
-            width: min(420px, 78vw);
-            height: 4px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.06);
-            overflow: hidden;
-            position: relative;
-        }
-        .nebula-loader-bar {
-            position: absolute;
-            top: 0; left: 0;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, #10b981 45%, #34d399 80%, rgba(16, 185, 129, 0.2) 100%);
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
-            border-radius: 999px;
-            transition: width 0.15s linear;
-        }
-        .nebula-loader-pct {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--accent);
-            letter-spacing: 2px;
-            margin-top: -18px;
-        }
-        .nebula-loader-orbit {
-            position: absolute;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            border: 1px dashed rgba(16, 185, 129, 0.22);
-            animation: loaderOrbit 14s linear infinite;
-        }
-        .nebula-loader-orbit.ring-2 {
-            width: 360px;
-            height: 360px;
-            border-color: rgba(56, 189, 248, 0.12);
-            animation-duration: 22s;
-            animation-direction: reverse;
-        }
-        .nebula-loader-orbit::before {
-            content: '';
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            top: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 0 14px var(--accent);
-        }
-        .nebula-loader-orbit.ring-2::before {
-            background: var(--exp-blue);
-            box-shadow: 0 0 14px var(--exp-blue);
-            top: 50%;
-            left: -4px;
-            transform: translateY(-50%);
-        }
-        @keyframes loaderOrbit {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .nebula-loader-hint {
-            position: absolute;
-            bottom: 42px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.25);
-            text-transform: uppercase;
-            animation: loaderHint 1.8s ease-in-out infinite;
-        }
-        @keyframes loaderHint {
-            0%, 100% { opacity: 0.25; }
-            50% { opacity: 0.65; }
-        }
     </style>
 </head>
 <body>
-
-    <div id="nebula-loading">
-        <div class="nebula-loader-orbit"></div>
-        <div class="nebula-loader-orbit ring-2"></div>
-        <div class="nebula-loader-logo">NEB<span>U</span>LA</div>
-        <div class="nebula-loader-tag">// Initializing community node</div>
-        <div class="nebula-loader-bar-wrap">
-            <div class="nebula-loader-bar" id="nebulaLoaderBar"></div>
-        </div>
-        <div class="nebula-loader-pct" id="nebulaLoaderPct">0%</div>
-        <div class="nebula-loader-hint">Syncing Terramon Index...</div>
-    </div>
 
     <nav>
         <a href="index.html" class="nav-logo">NEBULA</a>
@@ -1650,7 +1513,7 @@
         let activeMascotIndex = loadActiveMascotIndex();
         let mascotList = loadMascotList();
 
-        (function enforceTerramonAcerLine() {
+        (function enforceTerramonLines() {
             if (mascotList && mascotList[0]) {
                 mascotList[0].id = "terramon_a";
                 mascotList[0].name = "TERRAMON ACER";
@@ -1670,6 +1533,48 @@
                     src: "images/TerramonLine1Stage3.png",
                     desc: "A full-fledged ninja frog. The maple leaf that was once its tail has since detached and now sits proudly on its brow as a kasa-style hat. No maps, no staffs — it navigates purely by instinct, wind, and the quiet hum of the forest."
                 };
+            }
+            if (mascotList && mascotList[1]) {
+                mascotList[1].id = "terramon_b";
+                mascotList[1].name = "TERRAMON LINE 2";
+                if (!mascotList[1].stages) mascotList[1].stages = {};
+                mascotList[1].stages.stage1 = {
+                    name: "Shrawb",
+                    src: "images/TerramonLine2Stage1.png",
+                    desc: "A curious shrub cat that likes to vanish in plain sight. Its leafy coat rustles when it pounces, and it naps in hedges like it grew there."
+                };
+                mascotList[1].stages.stage2 = {
+                    name: "Foliound",
+                    src: "images/TerramonLine2Stage2.png",
+                    desc: "A bold woodland hunter wrapped in thick foliage. It pads silently through undergrowth, shaking off leaves like armor when it’s ready to chase."
+                };
+                mascotList[1].stages.stage3 = {
+                    name: "Tigent",
+                    src: "images/TerramonLine2Stage3.png",
+                    desc: "A powerful forest tiger with a canopy-colored coat. It guards its grove fiercely, but softens instantly around friends it trusts."
+                };
+            }
+            if (mascotList && mascotList[2]) {
+                mascotList[2].id = "terramon_c";
+                mascotList[2].name = "TERRAMON LINE 3";
+                if (!mascotList[2].stages) mascotList[2].stages = {};
+                mascotList[2].stages.stage1 = {
+                    name: "Tazel",
+                    src: "images/TerramonLine3Stage1.png",
+                    desc: "An electric beetle that crackles when it gets excited. It zips between stones and roots, charging itself with tiny sparks and daring leaps."
+                };
+                mascotList[2].stages.stage2 = {
+                    name: "Snorva",
+                    src: "images/TerramonLine3Stage2.png",
+                    desc: "A sleepy, stout beetle form that stores a lot of charge at once. It dozes to build power, then bursts awake in a flash of buzzing thunder."
+                };
+                mascotList[2].stages.stage3 = {
+                    name: "Elecanid",
+                    src: "images/TerramonLine3Stage3.png",
+                    desc: "A superhero electric beetle that streaks through the sky in arcs of light. It throws itself into danger without hesitation, leaving the air humming behind it."
+                };
+            }
+            if (mascotList) {
                 saveMascotState();
             }
         })();
@@ -1698,26 +1603,26 @@
                 },
                 {
                     id: "terramon_b",
-                    name: "TERRAMON BETA",
+                    name: "TERRAMON LINE 2",
                     level: 1,
                     currentExp: 0,
                     maxExp: getMaxExpForLevel(1),
                     stages: {
-                        stage1: { name: "TERRAMON BETA (BASIC)", src: "https://picsum.photos/seed/nebula_b1/300/200", desc: "Aquatic network telemetric probe." },
-                        stage2: { name: "TERRAMON BETA II (EVO)", src: "https://picsum.photos/seed/nebula_b2/300/200", desc: "Deep water quality testing and marine sensor suite." },
-                        stage3: { name: "TERRAMON BETA PRIME", src: "https://picsum.photos/seed/nebula_b3/300/200", desc: "Hydro-ecological core with ocean current analysis." }
+                        stage1: { name: "Shrawb", src: "images/TerramonLine2Stage1.png", desc: "A curious shrub cat that likes to vanish in plain sight. Its leafy coat rustles when it pounces, and it naps in hedges like it grew there." },
+                        stage2: { name: "Foliound", src: "images/TerramonLine2Stage2.png", desc: "A bold woodland hunter wrapped in thick foliage. It pads silently through undergrowth, shaking off leaves like armor when it’s ready to chase." },
+                        stage3: { name: "Tigent", src: "images/TerramonLine2Stage3.png", desc: "A powerful forest tiger with a canopy-colored coat. It guards its grove fiercely, but softens instantly around friends it trusts." }
                     }
                 },
                 {
                     id: "terramon_c",
-                    name: "TERRAMON GAMMA",
+                    name: "TERRAMON LINE 3",
                     level: 1,
                     currentExp: 0,
                     maxExp: getMaxExpForLevel(1),
                     stages: {
-                        stage1: { name: "TERRAMON GAMMA (BASIC)", src: "https://picsum.photos/seed/nebula_c1/300/200", desc: "Soil biomass monitor and seismic probe." },
-                        stage2: { name: "TERRAMON GAMMA II (EVO)", src: "https://picsum.photos/seed/nebula_c2/300/200", desc: "Geothermal radiation and soil health analyzer." },
-                        stage3: { name: "TERRAMON GAMMA PRIME", src: "https://picsum.photos/seed/nebula_c3/300/200", desc: "Tectonic environmental shield and biome overseer." }
+                        stage1: { name: "Tazel", src: "images/TerramonLine3Stage1.png", desc: "An electric beetle that crackles when it gets excited. It zips between stones and roots, charging itself with tiny sparks and daring leaps." },
+                        stage2: { name: "Snorva", src: "images/TerramonLine3Stage2.png", desc: "A sleepy, stout beetle form that stores a lot of charge at once. It dozes to build power, then bursts awake in a flash of buzzing thunder." },
+                        stage3: { name: "Elecanid", src: "images/TerramonLine3Stage3.png", desc: "A superhero electric beetle that streaks through the sky in arcs of light. It throws itself into danger without hesitation, leaving the air humming behind it." }
                     }
                 }
             ];
@@ -2756,83 +2661,6 @@
         updateExpHudUI();
         renderPokedexGrid();
         renderLeaderboard();
-
-        /* --- INITIAL LOADING SCREEN LOGIC --- */
-        (function bootLoadingScreen() {
-            const loader = document.getElementById('nebula-loading');
-            const bar = document.getElementById('nebulaLoaderBar');
-            const pct = document.getElementById('nebulaLoaderPct');
-            if (!loader) return;
-
-            const MIN_SHOW_MS = 1400;
-            const startedAt = performance.now();
-            let progress = 0;
-            let done = false;
-
-            function setProgress(p) {
-                if (done) return;
-                progress = Math.max(progress, Math.min(100, p));
-                if (bar) bar.style.width = progress + '%';
-                if (pct) pct.textContent = Math.round(progress) + '%';
-            }
-
-            function tryFinish() {
-                if (done) return;
-                if (progress < 100) return;
-                const now = performance.now();
-                const wait = Math.max(0, MIN_SHOW_MS - (now - startedAt));
-                setTimeout(() => {
-                    if (done) return;
-                    done = true;
-                    loader.classList.add('loader-out');
-                    setTimeout(() => { if (loader.parentNode) loader.remove(); }, 700);
-                }, wait);
-            }
-
-            const preloadTargets = [
-                "images/TerramonLine1Stage1.png",
-                "images/TerramonLine1Stage2.png",
-                "images/TerramonLine1Stage3.png"
-            ];
-            let loaded = 0;
-            preloadTargets.forEach(src => {
-                const img = new Image();
-                const finish = () => {
-                    loaded++;
-                    setProgress(15 + (loaded / preloadTargets.length) * 60);
-                    if (loaded === preloadTargets.length) allPreloaded.resolve();
-                };
-                img.onload = finish;
-                img.onerror = finish;
-                img.src = src;
-            });
-            const allPreloaded = makeDeferred();
-            setProgress(12);
-
-            const docReady = document.readyState === 'complete' ? Promise.resolve() : new Promise(r => window.addEventListener('load', r, { once: true }));
-
-            Promise.all([allPreloaded.promise, docReady]).then(() => {
-                let p = 78;
-                const finalTicker = setInterval(() => {
-                    p += 2;
-                    if (p >= 100) {
-                        p = 100;
-                        clearInterval(finalTicker);
-                    }
-                    setProgress(p);
-                    if (p >= 100) tryFinish();
-                }, 40);
-            });
-
-            setTimeout(() => { setProgress(100); tryFinish(); }, MIN_SHOW_MS + 1000);
-
-            function makeDeferred() {
-                const d = {};
-                d.promise = new Promise((res, rej) => { d.resolve = res; d.reject = rej; });
-                return d;
-            }
-        })();
     </script>
 </body>
 </html>
-

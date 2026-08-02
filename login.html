@@ -140,6 +140,144 @@
             text-decoration: underline;
             cursor: pointer !important;
         }
+
+        .terramon-celebration {
+            position: fixed;
+            inset: 0;
+            z-index: 250000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+        .terramon-celebration.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .celebration-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.62);
+            backdrop-filter: blur(2px);
+        }
+        .celebration-stage {
+            position: relative;
+            width: min(900px, 92vw);
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px 30px;
+        }
+        .celebration-message {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: 24px;
+            max-width: 720px;
+            font-size: clamp(1.5rem, 3.2vw, 2.35rem);
+            font-weight: 800;
+            line-height: 1.2;
+            color: #fff;
+            text-shadow: 0 0 18px rgba(0, 0, 0, 0.65);
+        }
+        .celebration-row {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+        .celebration-terramon {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            animation: terramonFloat 2s ease-in-out infinite;
+        }
+        .celebration-terramon:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+        .celebration-terramon:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+        .celebration-terramon img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
+        }
+        .celebration-terramon-name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+        }
+        .celebration-spotlight {
+            position: absolute;
+            top: -10px;
+            width: 240px;
+            height: 380px;
+            background: linear-gradient(to bottom, rgba(255, 250, 220, 0.6), rgba(255, 250, 220, 0.12) 35%, rgba(255, 250, 220, 0));
+            clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+            filter: blur(4px);
+            opacity: 0.78;
+            mix-blend-mode: screen;
+            transform-origin: top center;
+            z-index: 1;
+            animation: spotlightPulse 2s ease-in-out infinite;
+        }
+        .celebration-spotlight.left {
+            left: calc(50% - 270px);
+            transform: rotate(10deg);
+        }
+        .celebration-spotlight.center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .celebration-spotlight.right {
+            left: calc(50% + 30px);
+            transform: rotate(-10deg);
+        }
+        @keyframes spotlightPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.95; }
+        }
+        @keyframes terramonFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @media (max-width: 700px) {
+            .celebration-stage {
+                min-height: 500px;
+            }
+            .celebration-spotlight {
+                width: 170px;
+                height: 300px;
+            }
+            .celebration-spotlight.left {
+                left: calc(50% - 150px);
+            }
+            .celebration-spotlight.right {
+                left: calc(50% - 20px);
+            }
+            .celebration-terramon {
+                width: 135px;
+            }
+            .celebration-terramon img {
+                height: 135px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -184,6 +322,30 @@
             </div>
         </div>
     </main>
+
+    <div class="terramon-celebration" id="terramonCelebration">
+        <div class="celebration-backdrop"></div>
+        <div class="celebration-stage">
+            <div class="celebration-spotlight left"></div>
+            <div class="celebration-spotlight center"></div>
+            <div class="celebration-spotlight right"></div>
+            <div class="celebration-message">The Terramon have your back, now go help clean our air!</div>
+            <div class="celebration-row">
+                <div class="celebration-terramon">
+                    <img src="images/TerramonLine1Stage1.png" alt="Moplet">
+                    <div class="celebration-terramon-name">Moplet</div>
+                </div>
+                <div class="celebration-terramon">
+                    <img src="images/TerramonLine2Stage1.png" alt="Shrawb">
+                    <div class="celebration-terramon-name">Shrawb</div>
+                </div>
+                <div class="celebration-terramon">
+                    <img src="images/TerramonLine3Stage1.png" alt="Tazel">
+                    <div class="celebration-terramon-name">Tazel</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const dot = document.querySelector('.cursor-dot');
@@ -265,8 +427,17 @@
         const submitBtn = document.getElementById('submitBtn');
         const toggleText = document.getElementById('toggleText');
         const authNavBtn = document.getElementById('authNavBtn');
+        const terramonCelebration = document.getElementById('terramonCelebration');
 
         let isLoginState = params.get('mode') !== 'register';
+
+        function showTerramonCelebrationAndRedirect() {
+            terramonCelebration.classList.add('active');
+            setTimeout(() => {
+                terramonCelebration.classList.remove('active');
+                window.location.href = returnUrl;
+            }, 5000);
+        }
 
         function applyAuthModeUI() {
             if (isLoginState) {
@@ -326,7 +497,6 @@
                     return;
                 }
                 localStorage.setItem('nebula_active_user', email);
-                alert(`Authentication Successful. Welcome Operator ${email}.`);
             } else {
                 if (accounts[email]) {
                     alert("An account with this email already exists. Please log in instead.");
@@ -337,11 +507,10 @@
                 accounts[email] = pass;
                 saveAccounts(accounts);
                 localStorage.setItem('nebula_active_user', email);
-                alert(`Clearance Granted. Account created for Operator ${email}.`);
             }
 
             authForm.reset();
-            window.location.href = returnUrl;
+            showTerramonCelebrationAndRedirect();
         });
 
         applyAuthModeUI();

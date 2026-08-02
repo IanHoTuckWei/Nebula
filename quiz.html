@@ -262,10 +262,10 @@
     <section>
         <span style="font-family: 'JetBrains Mono'; color: var(--accent); letter-spacing: 3px;">// EVALUATION_MODULE</span>
         <h1>Test Your Knowledge</h1>
-        <p class="subtitle">Review regional timeline records, atmospheric crisis milestones, and policy interventions.</p>
+        <p class="subtitle">Review facts and decisions drawn from the Origins, Solutions, and History modules.</p>
 
         <div class="quiz-card" id="quiz-card">
-            <div class="quiz-status" id="quiz-progress">QUESTION 1 OF 15</div>
+            <div class="quiz-status" id="quiz-progress">QUESTION 1 OF 20</div>
             <div class="quiz-question" id="quiz-question">Loading parameter details...</div>
             
             <div class="options-grid" id="options-container">
@@ -316,139 +316,179 @@
         /* --- Quiz Data & State Engine --- */
         const quizData = [
             {
-                question: "In what year did the Great Haze, Southeast Asia's worst environmental disaster occur?",
+                question: "In what year did the Great Haze, Southeast Asia's worst environmental disaster, occur?",
                 options: ["1994", "1997", "2002", "2013"],
                 correctIndex: 1,
-                correctExplanation: "Correct! The 1997 Great Haze affected around 70 million people and caused an estimated $9 billion in damages.",
-                wrongExplanation: "Not quite. The correct answer is 1997. The Great Haze affected around 70 million people and caused an estimated $9 billion in damages."
+                correctExplanation: "Correct! The History page identifies 1997 as the year of the Great Haze.",
+                wrongExplanation: "Not quite. The correct answer is 1997, the year of the Great Haze."
             },
             {
-                question: "What record did Singapore's Pollutant Standards Index (PSI) hit in 2013?",
-                options: ["150", "250", "401", "500"],
+                question: "What treaty did ASEAN member states establish in 2002 to address transboundary haze pollution?",
+                options: [
+                    "Kyoto Protocol",
+                    "ASEAN Agreement on Transboundary Haze Pollution",
+                    "Jakarta Clean Air Accord",
+                    "Borneo Fire Pact"
+                ],
+                correctIndex: 1,
+                correctExplanation: "Correct! The 2002 milestone was the ASEAN Agreement on Transboundary Haze Pollution.",
+                wrongExplanation: "Not quite. The correct answer is the ASEAN Agreement on Transboundary Haze Pollution."
+            },
+            {
+                question: "What made the 2002 ASEAN Agreement historically significant?",
+                options: [
+                    "It ended all peatland fires immediately.",
+                    "It became the first regional legally binding treaty of its kind.",
+                    "It created the first PM2.5 sensor.",
+                    "It banned all cross-border trade."
+                ],
+                correctIndex: 1,
+                correctExplanation: "Correct! History describes it as the first regional legally binding treaty of its kind.",
+                wrongExplanation: "Not quite. Its milestone was becoming the first regional legally binding treaty of its kind."
+            },
+            {
+                question: "What PSI reading did Singapore hit during the 2013 city smog emergency?",
+                options: ["250", "320", "401", "500"],
                 correctIndex: 2,
-                correctExplanation: "Correct! In 2013, Singapore's PSI reached an all-time record high of 401, prompting health warnings.",
-                wrongExplanation: "Not quite. In 2013, Singapore's PSI reached an all-time record high of 401, prompting health warnings."
+                correctExplanation: "Correct! Singapore's PSI reached a record 401 in 2013.",
+                wrongExplanation: "Not quite. The correct answer is 401."
             },
             {
-                question: "What treaty did ASEAN member nations sign in 2002 to address the haze crisis?",
-                options: [
-                    "The Kyoto Protocol",
-                    "The ASEAN Agreement on Transboundary Haze Pollution",
-                    "The Jakarta Clean Air Accord",
-                    "The Borneo Fire Pact"
-                ],
+                question: "What climate phenomenon worsened the 2015 peatland fire crisis?",
+                options: ["La Nina", "El Nino", "Polar Vortex", "Monsoon reversal"],
                 correctIndex: 1,
-                correctExplanation: "Correct! The ASEAN Agreement on Transboundary Haze Pollution was signed in 2002 and became the first regional treaty of its kind in the world.",
-                wrongExplanation: "Not quite. The ASEAN Agreement on Transboundary Haze Pollution was signed in 2002 as the world's first regional treaty addressing transboundary haze."
+                correctExplanation: "Correct! Severe El Nino conditions prolonged the dry spell in 2015.",
+                wrongExplanation: "Not quite. The correct answer is El Nino."
             },
             {
-                question: "What historic milestone was achieved by the signing of the ASEAN Agreement on Transboundary Haze Pollution in 2002?",
-                options: [
-                    "It completely ended regional peatland fires.",
-                    "It became the first regional treaty of its kind globally.",
-                    "It established a maximum API cap of 401.",
-                    "It provided $9 billion in immediate environmental damages."
-                ],
-                correctIndex: 1,
-                correctExplanation: "Correct! The agreement became the first regional treaty of its kind anywhere in the world.",
-                wrongExplanation: "Not quite. It became the first regional treaty of its kind globally, marking a major milestone in regional environmental cooperation."
-            },
-            {
-                question: "What environmental factor triggered cross-border political tensions and a spike in hotspots across Sumatra and Borneo in 2019?",
-                options: [
-                    "Severe dry spells",
-                    "Industrial factory accidents",
-                    "New air quality tracking standards",
-                    "School closures lasting for weeks"
-                ],
-                correctIndex: 0,
-                correctExplanation: "Correct! Severe dry spells caused hotspot numbers to increase across Sumatra and Borneo, leading to massive carbon emissions and cross-border political tensions.",
-                wrongExplanation: "Not quite. Severe dry spells fueled fires across Sumatra and Borneo and contributed to widespread haze and political tensions."
-            },
-            {
-                question: "Which two specific geographic areas are listed as having hotspot spikes during the 2019 'Return of the Smog'?",
-                options: [
-                    "Singapore and Malaysia",
-                    "Southeast Asia and ASEAN",
-                    "Kalimantan and Central Indonesia",
-                    "Sumatra and Borneo"
-                ],
-                correctIndex: 3,
-                correctExplanation: "Correct! The 2019 timeline states that hotspots spiked across Sumatra and Borneo due to severe dry spells.",
-                wrongExplanation: "Not quite. The 2019 timeline states that hotspots spiked across these two regions due to severe dry spells."
-            },
-            {
-                question: "Which primary fine particulate matter is most hazardous to human health during regional haze crises?",
-                options: ["PM10", "PM2.5", "CO2", "SO2"],
-                correctIndex: 1,
-                correctExplanation: "Correct! PM2.5 consists of microscopic particles small enough to penetrate deep into the lungs and bloodstreams.",
-                wrongExplanation: "Not quite. PM2.5 is the fine particulate matter primarily responsible for severe respiratory risks during haze events."
-            },
-            {
-                question: "During the 2015 State of Emergency in Central Kalimantan, to what level did visibility drop?",
+                question: "During the 2015 emergency in Central Kalimantan, how low did visibility fall?",
                 options: ["Below 50 meters", "Below 200 meters", "Below 500 meters", "Below 1 kilometer"],
                 correctIndex: 0,
-                correctExplanation: "Correct! Visibility dropped below 50 meters in Central Kalimantan due to subterranean peatland fires.",
-                wrongExplanation: "Not quite. Extreme smog reduced visibility to below 50 meters, severely interrupting aviation and daily life."
+                correctExplanation: "Correct! History states visibility dropped below 50 meters.",
+                wrongExplanation: "Not quite. The correct answer is below 50 meters."
             },
             {
-                question: "What natural climate phenomenon significantly exacerbated the prolonged dry spell and fire intensity in 2015?",
-                options: ["La Niña", "El Niño", "Indian Ocean Dipole Neutral", "Polar Vortex"],
+                question: "Which two regions were named as hotspot spike areas during the 2019 return of the smog?",
+                options: ["Singapore and Penang", "Sumatra and Borneo", "Java and Bali", "Kalimantan and Bangkok"],
                 correctIndex: 1,
-                correctExplanation: "Correct! Severe El Niño conditions brought prolonged dry weather that worsened peatland ignition and fire spread.",
-                wrongExplanation: "Not quite. El Niño conditions were responsible for bringing extended dry spells across the region in 2015."
+                correctExplanation: "Correct! The History page names Sumatra and Borneo.",
+                wrongExplanation: "Not quite. The hotspot spikes were recorded across Sumatra and Borneo."
             },
             {
-                question: "What primary agricultural practice historically contributes most to land clearing fires in peatlands?",
-                options: ["Crop Rotation", "Slash-and-Burn", "Hydroponics", "Terrace Farming"],
+                question: "Which pollutant is described as the most hazardous fine particulate matter during haze crises?",
+                options: ["PM10", "PM2.5", "SO2", "CO2"],
                 correctIndex: 1,
-                correctExplanation: "Correct! Slash-and-burn clearing is cheap and fast, but frequently ignites underground peat soil.",
-                wrongExplanation: "Not quite. The slash-and-burn land clearing method is the primary driver of uncontrollable peatland blazes."
+                correctExplanation: "Correct! Origins identifies PM2.5 as the dangerous fine particulate that penetrates deep into the lungs.",
+                wrongExplanation: "Not quite. The correct answer is PM2.5."
             },
             {
-                question: "What physical characteristic makes peatland fires particularly difficult to extinguish?",
+                question: "Nitrogen oxides are emitted mainly by which two sources?",
+                options: ["Motor vehicles and power plants", "Wetlands and rivers", "Hospitals and schools", "Wind farms and dams"],
+                correctIndex: 0,
+                correctExplanation: "Correct! Origins says nitrogen oxides are emitted mainly by motor vehicles and power plants.",
+                wrongExplanation: "Not quite. The correct answer is motor vehicles and power plants."
+            },
+            {
+                question: "Which gas is listed as a leading cause of acid rain when sulfur-containing fuels are burned?",
+                options: ["Ammonia", "Ozone", "Sulfur dioxide", "Carbon monoxide"],
+                correctIndex: 2,
+                correctExplanation: "Correct! Origins identifies sulfur dioxide as a leading cause of acid rain.",
+                wrongExplanation: "Not quite. The correct answer is sulfur dioxide."
+            },
+            {
+                question: "Ammonia is released mostly from which activities?",
+                options: ["Marine shipping and ports", "Agricultural activities like livestock farming and fertilizers", "Solar farms", "Household cooking only"],
+                correctIndex: 1,
+                correctExplanation: "Correct! Origins says ammonia mainly comes from livestock farming and fertilizers.",
+                wrongExplanation: "Not quite. The correct answer is agricultural activities like livestock farming and fertilizers."
+            },
+            {
+                question: "In the Origins module, VOCs interact with nitrogen oxides under solar radiation to multiply the formation of what?",
+                options: ["Acid rain", "Ground-level ozone", "Cloudless skies", "Oxygen bubbles"],
+                correctIndex: 1,
+                correctExplanation: "Correct! VOCs and NOx under sunlight help form ground-level ozone.",
+                wrongExplanation: "Not quite. The correct answer is ground-level ozone."
+            },
+            {
+                question: "What pollutant is described as an industrial byproduct trapped by thermal inversions and highly carcinogenic?",
+                options: ["Benzene", "Methane", "Ammonia", "Oxygen"],
+                correctIndex: 0,
+                correctExplanation: "Correct! Origins describes benzene that way and notes its leukemia risk.",
+                wrongExplanation: "Not quite. The correct answer is benzene."
+            },
+            {
+                question: "In the Sumatra-to-Cities pipeline, what natural system pushes particulates across the ocean toward urban centers?",
+                options: ["Jet stream collapse", "Monsoon cycle", "Tidal forcing", "Polar winds"],
+                correctIndex: 1,
+                correctExplanation: "Correct! Origins says the Monsoon Cycle pushes particulates across the ocean.",
+                wrongExplanation: "Not quite. The correct answer is the Monsoon Cycle."
+            },
+            {
+                question: "What does a thermal inversion do in the Origins module's city pipeline explanation?",
                 options: [
-                    "They burn underwater",
-                    "They burn underground (subterranean)",
-                    "They burn at temperatures exceeding 2000°C",
-                    "They produce invisible smoke"
+                    "It cools the ocean and stops haze transport.",
+                    "It traps pollutants between skyscrapers and over streets.",
+                    "It dissolves PM2.5 in rainwater instantly.",
+                    "It creates new wetlands."
                 ],
                 correctIndex: 1,
-                correctExplanation: "Correct! Peat fires burn underground through dense organic matter, requiring massive amounts of water to fully suppress.",
-                wrongExplanation: "Not quite. Subterranean burning allows peat fires to smolder silently beneath the surface for months."
+                correctExplanation: "Correct! Thermal inversion traps the pollution in a dense layer over the city.",
+                wrongExplanation: "Not quite. The correct answer is that it traps pollutants between skyscrapers and over streets."
             },
             {
-                question: "How many people were estimated to have been directly exposed to toxic PM2.5 levels during the 1997 disaster?",
-                options: ["10 Million", "25 Million", "50 Million", "Over 70 Million"],
-                correctIndex: 3,
-                correctExplanation: "Correct! Over 70 million individuals across multiple nations were exposed to hazardous pollution levels in 1997.",
-                wrongExplanation: "Not quite. Records estimate over 70 million people suffered direct exposure to hazardous PM2.5 levels during the crisis."
+                question: "In the Solutions page, satellite and AI monitoring systems cross-reference hotspot coordinates with what to identify responsible entities?",
+                options: ["School maps", "Land concession maps", "Tourist maps", "Shipping manifests"],
+                correctIndex: 1,
+                correctExplanation: "Correct! The Solutions module says AI checks hotspot locations against land concession maps.",
+                wrongExplanation: "Not quite. The correct answer is land concession maps."
             },
             {
-                question: "What modern technological infrastructure is used in 2026 to detect active hotspots in real time?",
+                question: "What is the main purpose of building canal blocks across drained peat domes?",
                 options: [
-                    "Satellite Telemetry & IoT Sensors",
-                    "Manual Ground Patrols Only",
-                    "High-Altitude Weather Balloons",
-                    "Acoustic Fire Detectors"
+                    "To increase shipping traffic",
+                    "To raise water tables and re-wet dried soil beds",
+                    "To store diesel fuel",
+                    "To speed up land clearing"
+                ],
+                correctIndex: 1,
+                correctExplanation: "Correct! Solutions explains that canal blocks raise subterranean water tables and re-wet peat.",
+                wrongExplanation: "Not quite. The correct answer is to raise water tables and re-wet dried soil beds."
+            },
+            {
+                question: "Which set of pollutants do community IoT air quality nodes measure in the Solutions module?",
+                options: [
+                    "PM2.5, PM10, carbon monoxide, and VOCs",
+                    "Only rainfall and humidity",
+                    "Only temperature and sunlight",
+                    "Nitrogen and oxygen only"
                 ],
                 correctIndex: 0,
-                correctExplanation: "Correct! Advanced satellite telemetry combined with real-time IoT air monitoring sensors form the standard tracking protocol.",
-                wrongExplanation: "Not quite. Satellite telemetry combined with IoT sensor networks provides the primary automated tracking today."
+                correctExplanation: "Correct! Solutions lists PM2.5, PM10, carbon monoxide, and VOCs.",
+                wrongExplanation: "Not quite. The correct answer is PM2.5, PM10, carbon monoxide, and VOCs."
             },
             {
-                question: "In what year did air pollution emergency alerts hit Singapore with a record PSI reading above 400?",
-                options: ["1997", "2002", "2013", "2019"],
-                correctIndex: 2,
-                correctExplanation: "Correct! In June 2013, Singapore recorded a historic peak PSI of 401.",
-                wrongExplanation: "Not quite. It occurred in 2013 when the PSI broke previous records and climbed to 401."
+                question: "During severe haze, what kind of public facilities are retrofitted into positive-pressure clean-air shelters?",
+                options: [
+                    "Libraries, community halls, and athletic centers",
+                    "Only airports",
+                    "Only shopping malls",
+                    "Oil refineries"
+                ],
+                correctIndex: 0,
+                correctExplanation: "Correct! Solutions says public places like libraries, community halls, and athletic centers can be converted into clean-air shelters.",
+                wrongExplanation: "Not quite. The correct answer is libraries, community halls, and athletic centers."
             },
             {
-                question: "Estimated total economic damages caused by the 1997 Great Haze exceeded which threshold?",
-                options: ["$1 Billion", "$5 Billion", "$9 Billion", "$20 Billion"],
-                correctIndex: 2,
-                correctExplanation: "Correct! Economic losses from healthcare costs, business shutdowns, and flight cancellations exceeded $9 billion.",
-                wrongExplanation: "Not quite. Total calculated economic damage from the 1997 crisis exceeded $9 billion USD."
+                question: "What do RSPO and FSC certifications help ensure, according to the Solutions module?",
+                options: [
+                    "That products are produced without deforestation, peatland destruction, or open burning",
+                    "That all farms use slash-and-burn methods",
+                    "That masks are filtered only for dust",
+                    "That every product is manufactured locally"
+                ],
+                correctIndex: 0,
+                correctExplanation: "Correct! Solutions says these certifications support products made without deforestation, peatland destruction, or open burning.",
+                wrongExplanation: "Not quite. The correct answer is that they help ensure no deforestation, peatland destruction, or open burning."
             }
         ];
 
@@ -609,4 +649,3 @@
     </script>
 </body>
 </html>
-
