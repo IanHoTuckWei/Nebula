@@ -2051,6 +2051,56 @@
 
         let events = loadEventsFromStorage();
 
+        function ensureSampleCompletedActivity() {
+            const sampleActivities = [
+                {
+                    id: 9001,
+                    title: "Neighborhood Air Cleanup Drive",
+                    timestamp: new Date("2026-07-20T08:30:00").getTime(),
+                    dateDisplay: "JUL 20, 2026 // 08:30 AM",
+                    location: "Tanjung Bungah Community Park",
+                    desc: "A completed community cleanup focused on litter removal, smoke awareness, and keeping shared green spaces healthier for everyone.",
+                    attendees: 8,
+                    attendeeList: [
+                        { name: "Farah Lim", isHost: true, status: "Host" },
+                        { name: "You", isHost: false, status: "Completed" }
+                    ],
+                    isSignedUp: true,
+                    isUserHost: false,
+                    attendanceStatus: "Completed",
+                    isClaimed: false
+                },
+                {
+                    id: 9002,
+                    title: "Mangrove Replanting Morning",
+                    timestamp: new Date("2026-07-12T07:45:00").getTime(),
+                    dateDisplay: "JUL 12, 2026 // 07:45 AM",
+                    location: "Balik Pulau Coastal Reserve",
+                    desc: "A completed restoration session where volunteers replanted mangrove saplings and learned how coastal ecosystems help protect air and water quality.",
+                    attendees: 14,
+                    attendeeList: [
+                        { name: "Daniel Tan", isHost: true, status: "Host" },
+                        { name: "You", isHost: false, status: "Completed" }
+                    ],
+                    isSignedUp: true,
+                    isUserHost: false,
+                    attendanceStatus: "Completed",
+                    isClaimed: false
+                }
+            ];
+
+            sampleActivities.forEach(sampleActivity => {
+                const alreadyExists = events.some(e => e.id === sampleActivity.id);
+                if (!alreadyExists) {
+                    events.push(sampleActivity);
+                }
+            });
+
+            saveEventsToStorage();
+        }
+
+        ensureSampleCompletedActivity();
+
         function saveEventsToStorage() {
             localStorage.setItem('nebula_events_v3', JSON.stringify(events));
         }
