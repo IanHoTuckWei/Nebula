@@ -28,7 +28,7 @@
             justify-content: space-between;
         }
 
-        /* --- CURSOR STYLING --- */
+        /* neon cursor */
         .cursor-dot {
             width: 8px; height: 8px; background: var(--accent);
             position: fixed; border-radius: 50%; pointer-events: none;
@@ -42,7 +42,7 @@
             transform: translate(-50%, -50%);
         }
 
-        /* --- NAVIGATION --- */
+        /* navigation */
         nav {
             position: fixed; top: 0; width: 100%; padding: 1.8rem 8%;
             display: flex; justify-content: space-between; align-items: center;
@@ -91,7 +91,7 @@
             color: #000 !important;
         }
 
-        /* CONTENT LAYOUT */
+        /* content layout */
         main {
             flex: 1;
             width: 100%;
@@ -131,7 +131,7 @@
             line-height: 1.6;
         }
 
-        /* COUNTRY SEARCH BAR CONTAINER */
+        /* search bar container */
         .search-container {
             width: 100%;
             max-width: 1200px;
@@ -170,7 +170,7 @@
             white-space: nowrap;
         }
 
-        /* SIMULATOR DASHBOARD GRID */
+        /* dashboard grid */
         .simulator-grid {
             width: 100%;
             max-width: 1200px;
@@ -239,7 +239,7 @@
             transform: scale(1.3);
         }
 
-        /* READOUT PANEL */
+        /* readout panel */
         .display-panel {
             display: flex;
             flex-direction: column;
@@ -326,7 +326,7 @@
             color: #fff;
         }
 
-        /* --- NEW FEATURE: LIVE GLOBAL CITY SEARCH TERMINAL --- */
+        /* live global city search terminal */
         .live-aqi-wrapper {
             width: 100%;
             max-width: 1200px;
@@ -681,7 +681,7 @@
     </footer>
 
     <script>
-        /* --- Cursor Following --- */
+        /* cursor movement */
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
         window.addEventListener('mousemove', (e) => {
@@ -696,7 +696,7 @@
             el.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
         });
 
-        /* --- Global Country Database (WRI / GFW & OpenAQ Benchmarks) --- */
+        /* global country database */
         const countryDatabase = {
             "IDN": {
                 name: "INDONESIA",
@@ -748,7 +748,7 @@
         const sliderPeatland = document.getElementById('peatland');
         const sliderMitigation = document.getElementById('mitigation');
 
-        /* --- Load Selected Country Data --- */
+        /* load country data selected */
         function loadCountryData(code) {
             const data = countryDatabase[code];
             if (!data) return;
@@ -762,7 +762,7 @@
             calculateImpact();
         }
 
-        /* --- Calculation Engine --- */
+        /* calculation engine */
         function calculateImpact() {
             const deforest = parseInt(sliderDeforest.value);
             const emissions = parseInt(sliderEmissions.value);
@@ -842,7 +842,7 @@
 
         loadCountryData('IDN');
 
-        /* --- LIVE GLOBAL SEARCH API ENGINE --- */
+        /* global search API engine */
         async function fetchLiveAQI(locationName) {
             const cityNameEl = document.getElementById('liveCityName');
             const coordsEl = document.getElementById('liveCoordinates');
@@ -852,7 +852,7 @@
             searchBtn.style.opacity = '0.6';
 
             try {
-                // Step 1: Geocoding lookup via Open-Meteo
+                // step 1: Geocoding lookup via Open-Meteo
                 const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationName)}&count=1&language=en&format=json`;
                 const geoRes = await fetch(geoUrl);
                 const geoData = await geoRes.json();
@@ -928,7 +928,7 @@
             }
         });
 
-        // Initialize default search on page load
+        // default search on page load
         fetchLiveAQI('Singapore');
 
         function checkAuthState() {
