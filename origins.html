@@ -6,26 +6,67 @@
     <title>THE ORIGINS | NEBULA</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050505; --accent: #10b981; --danger: #ff3e3e; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        
-        body { background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
-
-        /* Higher Layer Cursor */
-        .cursor-dot { width: 8px; height: 8px; background: var(--accent); position: fixed; border-radius: 50%; pointer-events: none; z-index: 100001; }
-        .cursor-outline { width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5); position: fixed; border-radius: 50%; pointer-events: none; z-index: 100000; transition: transform 0.15s ease-out; }
-
-        /* Nav Fix */
-        .global-nav {
-            position: fixed; top: 0; width: 100%; padding: 25px 8%;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 9999;
+        :root { 
+            --accent: #10b981; 
+            --danger: #ef4444;
+            --bg-dark: #0a0a0c;
+            --line-gray: rgba(255, 255, 255, 0.15);
         }
-        .nav-logo { font-weight: 900; letter-spacing: 4px; color: #fff; font-size: 1.2rem; text-decoration: none; }
-        .nav-links { display: flex; align-items: center; }
-        .nav-links a { color: #888; text-decoration: none; margin-left: 30px; font-family: 'JetBrains Mono'; font-size: 0.75rem; text-transform: uppercase; transition: color 0.3s ease; }
-        .nav-links a:hover { color: var(--accent); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { cursor: none !important; }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #07131e 0%, #0a0e14 45%, #051d18 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* neon cursor */
+        .cursor-dot {
+            width: 8px; height: 8px; background: var(--accent);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200001;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200000; transition: transform 0.15s ease-out;
+            transform: translate(-50%, -50%);
+        }
+
+        /* navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.8rem 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: white; 
+        }
+        .nav-logo {
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; align-items: center; gap: 2rem; }
+        .nav-links a { 
+            text-decoration: none; 
+            color: #888; 
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            transition: color 0.2s ease; 
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: var(--accent); }
+
         .auth-btn {
             background: transparent;
             border: 1px solid var(--accent);
@@ -37,7 +78,6 @@
             text-transform: uppercase;
             font-weight: 800;
             transition: all 0.3s ease;
-            margin-left: 30px;
             text-decoration: none;
             cursor: pointer !important;
         }
@@ -46,11 +86,17 @@
             color: #000 !important;
         }
 
-        /* Snap Scroll Layout */
-        .main-scroll { height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; }
-        section { height: 100vh; scroll-snap-align: start; position: relative; padding: 100px 8%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+            section {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 140px 8% 80px 8%;
+        }
 
-        /* Animated Background Text */
+        h1 { font-size: clamp(3rem, 8vw, 5.5rem); letter-spacing: -2px; line-height: 1; margin-bottom: 20px; }
+        p.subtitle { max-width: 700px; font-size: 1.2rem; opacity: 0.85; line-height: 1.6; }
+
+        /* animated background text */
         .flow-text { position: absolute; white-space: nowrap; font-size: 15vh; font-weight: 800; opacity: 0.03; z-index: -1; animation: moveText 30s linear infinite; pointer-events: none; }
         @keyframes moveText { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
@@ -58,7 +104,7 @@
         .module-desc { color: #666; font-size: 0.9rem; text-align: center; margin-bottom: 20px; max-width: 600px; }
         h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -3px; text-align: center; line-height: 0.9; }
 
-        /* Full-Width Text (No Box, Bolded) */
+        /* full width text */
         .full-width-desc {
             width: 100%;
             max-width: 1200px;
@@ -70,7 +116,7 @@
             text-align: left;
         }
 
-        /* The Grid */
+        /* card grid */
         .scanner-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
@@ -98,13 +144,13 @@
 
         .scanner-box:hover { border-color: var(--accent); background: rgba(16, 185, 129, 0.05); transform: translateY(-5px); }
 
-        /* Active Grid Layout when a box is expanded */
+        /* active grid layout when expanded */
         .scanner-grid.has-active {
             display: flex;
             flex-wrap: wrap;
         }
 
-        /* Expanded State */
+        /* when expanded */
         .scanner-box.expanded {
             width: 100%;
             height: auto;
@@ -117,7 +163,7 @@
             justify-content: flex-start;
         }
 
-        /* Expanded Content Layout (Text + Image) */
+        /* expanded content layout */
         .expanded-content {
             display: none;
             opacity: 0;
@@ -151,7 +197,7 @@
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
 
-        /* Shrunken State */
+        /* when shrunken */
         .scanner-grid.has-active .scanner-box:not(.expanded) {
             flex: 1 1 120px;
             height: 140px;
@@ -169,7 +215,7 @@
             display: none;
         }
 
-        /* Module 02 Vertical List Layout */
+        /* module 2 vertical layout */
         .shock-list {
             display: flex;
             flex-direction: column;
@@ -255,7 +301,7 @@
             padding-top: 20px;
         }
 
-        /* Specific interactive styles for Pipeline & Chain Reactions */
+        /* interactive styles and pipeline reactions */
         .pipeline-group {
             margin-bottom: 40px;
         }
@@ -782,7 +828,7 @@
     </div>
 
     <script>
-        // Custom Cursor Movement
+        /* cursor movement */
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
         window.addEventListener('mousemove', (e) => {
@@ -792,13 +838,13 @@
             outline.style.top = e.clientY - 16 + 'px';
         });
 
-        // Toggle card focus & resize animations for grid modules
+        /* card focus and animation for grid box */
         document.querySelectorAll('.scanner-box').forEach(box => {
             box.addEventListener('click', () => {
                 const currentGrid = box.closest('.scanner-grid');
                 const isAlreadyExpanded = box.classList.contains('expanded');
 
-                // Clear current active state from all boxes in this grid
+                /* clear active state from grid box */
                 currentGrid.querySelectorAll('.scanner-box').forEach(b => b.classList.remove('expanded'));
 
                 if (!isAlreadyExpanded) {
@@ -810,7 +856,7 @@
             });
         });
 
-        // Toggle expand/shrink for pipeline steps in Module 03
+        /* toggle expand in module 3 */
         document.querySelectorAll('.pipeline-step').forEach(step => {
             step.addEventListener('click', () => {
                 step.classList.toggle('expanded');
