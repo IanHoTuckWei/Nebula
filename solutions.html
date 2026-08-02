@@ -27,7 +27,7 @@
             justify-content: space-between;
         }
 
-        /* --- HIGHEST Z-INDEX CURSOR --- */
+        /* --- neon cursor --- */
         .cursor-dot {
             width: 8px; height: 8px; background: var(--accent);
             position: fixed; border-radius: 50%; pointer-events: none;
@@ -41,7 +41,7 @@
             transform: translate(-50%, -50%);
         }
 
-        /* --- GLOBAL NAVIGATION --- */
+        /* --- navigation --- */
         nav {
             position: fixed; top: 0; width: 100%; padding: 1.8rem 8%;
             display: flex; justify-content: space-between; align-items: center;
@@ -90,7 +90,7 @@
             color: #000 !important;
         }
 
-        /* CONTENT SECTION LAYOUT */
+        /* content section layouts */
         main {
             flex: 1;
             width: 100%;
@@ -100,7 +100,7 @@
             align-items: center;
         }
 
-        /* TITLE CARD */
+        /* title cards */
         .title-card {
             text-align: center;
             margin-bottom: 70px;
@@ -130,7 +130,7 @@
             line-height: 1.6;
         }
 
-        /* MAIN CATEGORY SECTIONS */
+        /* main sections */
         .main-category {
             width: 100%;
             margin-bottom: 90px;
@@ -156,7 +156,7 @@
             font-size: 1.8rem;
         }
 
-        /* SUB-ITEM CONTAINERS */
+        /* sub item containers */
         .sub-method {
             width: 100%;
             margin-bottom: 65px;
@@ -205,7 +205,7 @@
             color: #ffffff;
         }
 
-        /* THREE PICTURE GRID */
+        /* pictures grid boxes */
         .image-grid-three {
             width: 100%;
             display: grid;
@@ -242,7 +242,7 @@
             filter: brightness(1);
         }
 
-        /* Overlay text hidden by default */
+        /* overlay text hidden by default */
         .overlay-text {
             position: absolute;
             top: 50%;
@@ -260,7 +260,7 @@
             width: 80%;
         }
 
-        /* Darkening overlay hidden by default */
+        /* darkening overlay hidden by default */
         .method-image-box::before {
             content: '';
             position: absolute;
@@ -273,7 +273,7 @@
             z-index: 5;
         }
 
-        /* Active state for clicked images */
+        /* active state for clicked images */
         .method-image-box.active img {
             filter: brightness(0.2) blur(2px); /* Darken & slightly blur image */
         }
@@ -306,7 +306,7 @@
             opacity: 0;
         }
 
-        /* CALL TO ACTION SECTION */
+        /* call to action section */
         .cta-section {
             text-align: center;
             margin-top: 40px;
@@ -337,7 +337,7 @@
             opacity: 0.9;
         }
 
-        /* FOOTER */
+        /* footer */
         footer { 
             position: relative;
             padding: 80px 0; 
@@ -686,7 +686,7 @@
     </footer>
 
     <script>
-        /* --- Cursor Following --- */
+        /* cursor movement */
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
         window.addEventListener('mousemove', (e) => {
@@ -696,19 +696,19 @@
             outline.style.top = e.clientY + 'px';
         });
 
-        /* --- Click Interaction for Images --- */
+        /* clicking movements */
         document.querySelectorAll('.method-image-box').forEach(box => {
-            // Mouseenter/leave for cursor effect
+            // cursor effect
             box.addEventListener('mouseenter', () => outline.style.transform = 'translate(-50%, -50%) scale(1.5)');
             box.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
             
-            // Click to toggle active state (darken & show text)
+            //click to toggle active state
             box.addEventListener('click', function() {
                 this.classList.toggle('active');
             });
         });
 
-        // Mouseenter/leave for other links
+        // leave for other links
         document.querySelectorAll('a').forEach(el => {
             el.addEventListener('mouseenter', () => outline.style.transform = 'translate(-50%, -50%) scale(1.5)');
             el.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
