@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEBULA | Community Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --accent: #10b981; 
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --exp-blue: #38bdf8;
+            --bg-dark: #0a0a0c;
+            --card-bg: rgba(13, 13, 15, 0.75);
+            --sidebar-bg: rgba(10, 10, 12, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-muted: #a1a1aa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { cursor: none !important; }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #07131e 0%, #0a0e14 45%, #051d18 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor-dot {
+            width: 8px; height: 8px; background: var(--accent);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200001;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200000; 
+            transition: transform 0.15s ease-out, width 0.15s ease, height 0.15s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        /* --- GLOBAL NAVIGATION --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.5rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: white; 
+        }
+        .nav-logo {
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; align-items: center; gap: 2rem; }
+        .nav-links a { 
+            text-decoration: none; 
+            color: #888; 
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            transition: color 0.2s ease; 
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: var(--accent); }
+
+        .auth-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            cursor: pointer !important;
+        }
+        .auth-btn:hover {
+            background: var(--accent);
+            color: #000 !important;
+        }
+
+        /* --- AUTH GATE (grey out page when not logged in) --- */
+        #auth-gate-overlay {
+            display: none;
+            position: fixed;
+            top: 75px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: grayscale(0.6);
+            pointer-events: all;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+            padding: 24px;
+        }
+        #auth-gate-overlay.active { display: flex; }
+
+        .auth-gate-msg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #ccc;
+            letter-spacing: 1px;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+        .auth-gate-msg strong { color: var(--accent); }
+
+        body.auth-locked .app-container,
+        body.auth-locked footer,
+        body.auth-locked .user-rank-sticky-bar {
+            filter: grayscale(1) brightness(0.45);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* --- APP WRAPPER LAYOUT --- */
+        .app-container {
+            display: flex;
+            margin-top: 75px;
+            min-height: calc(100vh - 75px);
+            padding-bottom: 90px;
+        }
+
+        /* --- LEFT SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            padding: 30px 16px 220px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: fixed;
+            top: 75px;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0 12px 12px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: #888;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-align: left;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .sidebar-tab:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-tab.active {
+            color: #fff;
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .sidebar-tab.active::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* --- BOTTOM LEFT EXP HUD BAR & TERRAMON FRAME --- */
+        .exp-hud-container {
+            position: fixed;
+            bottom: 20px;
+            left: 16px;
+            width: 228px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .level-mascot {
+            width: 100%;
+            height: 125px;
+            background: rgba(13, 13, 15, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .level-mascot:hover {
+            border-color: var(--exp-blue);
+            transform: translateY(-2px);
+        }
+
+        .level-mascot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .mascot-hint {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #aaa;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .exp-hud {
+            width: 100%;
+            background: rgba(13, 13, 15, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .exp-hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .level-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--exp-blue);
+            letter-spacing: 1px;
+        }
+
+        .exp-text {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .exp-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .exp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #38bdf8, #60a5fa);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- BLUE PARTICLES --- */
+        .blue-particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #38bdf8;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 8px #38bdf8, 0 0 12px #60a5fa;
+            z-index: 999999;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease-out;
+        }
+
+        /* --- CONTENT AREA --- */
+        .content-area {
+            flex-grow: 1;
+            margin-left: 260px;
+            padding: 40px 5% 40px 5%;
+            max-width: 1300px;
+            width: calc(100% - 260px);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .empty-placeholder {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .header-tag {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .page-title {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            max-width: 700px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        /* --- CONTROL PANEL --- */
+        .filter-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 35px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .target-time-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .time-picker-trigger {
+            background: #141417;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .time-picker-trigger:hover { border-color: var(--accent); }
+
+        /* --- FIXED OVERLAY CALENDAR DROPDOWN --- */
+        .calendar-dropdown {
+            position: fixed;
+            width: 320px;
+            background: #0d0d0f;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+            z-index: 200000;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            backdrop-filter: blur(25px);
+            outline: none;
+        }
+
+        .calendar-dropdown.active { display: flex; }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cal-month-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .cal-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 4px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .cal-day-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            padding: 4px 0;
+        }
+
+        .cal-day {
+            padding: 8px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .cal-day:not(.empty):hover {
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .cal-day.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .cal-day.empty { background: transparent; pointer-events: none; }
+
+        .time-select-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 10px;
+            gap: 6px;
+        }
+
+        .time-controls { display: flex; align-items: center; gap: 4px; }
+
+        .time-select {
+            background: #141417;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 5px 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .lock-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 6px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.7rem;
+            border-radius: 2px;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .action-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-radius: 2px;
+            transition: opacity 0.2s ease;
+        }
+
+        /* --- EVENTS GRID --- */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .event-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease, opacity 0.5s ease, filter 0.5s ease;
+            position: relative;
+        }
+
+        .event-card.clickable { transition: all 0.2s ease; }
+        .event-card.clickable:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+        }
+
+        .event-card.completed-claimable {
+            border-color: var(--exp-blue);
+            background: rgba(14, 165, 233, 0.08);
+            animation: pulseBlue 2s infinite ease-in-out;
+        }
+
+        .event-card.claiming-out {
+            opacity: 0 !important;
+            transform: scale(0.85) translateY(15px) !important;
+            filter: blur(4px) !important;
+            pointer-events: none !important;
+        }
+
+        @keyframes pulseBlue {
+            0%, 100% { border-color: rgba(56, 189, 248, 0.4); }
+            50% { border-color: rgba(56, 189, 248, 0.9); }
+        }
+
+        .event-card.past-event {
+            opacity: 0.6;
+            border-style: dashed;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-badge.completed {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--exp-blue);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+        }
+
+        .status-badge.not-present {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .time-diff-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .time-diff-tag.passed { color: var(--danger); }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+        }
+
+        .event-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .meta-list {
+            list-style: none;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            color: #ccc;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .attendee-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 7px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .host-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 12px;
+            border-radius: 2px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        /* --- TERRAMON POKEDEX INDEX STYLES --- */
+        .pokedex-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .pokedex-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.25s ease;
+        }
+
+        .pokedex-card.unlocked {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .pokedex-card.unlocked:hover {
+            border-color: var(--exp-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+        }
+
+        .pokedex-card.locked {
+            opacity: 0.65;
+            border-style: dashed;
+        }
+
+        .pokedex-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pokedex-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s ease;
+        }
+
+        .pokedex-card.locked img {
+            filter: grayscale(100%) blur(5px) brightness(0.4);
+        }
+
+        .lock-overlay-badge {
+            position: absolute;
+            background: rgba(10, 10, 12, 0.85);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+        }
+
+        .pokedex-index-num {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--exp-blue);
+            padding: 3px 7px;
+            border-radius: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .pokedex-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pokedex-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .pokedex-stage-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+        }
+
+        .pokedex-stage-tag.active-tag {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        /* --- LEADERBOARD STYLES --- */
+        .leaderboard-toggle-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .lb-toggle-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 22px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .lb-toggle-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .lb-toggle-btn.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .leaderboard-table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            backdrop-filter: blur(15px);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .lb-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 160px 180px;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: 'JetBrains Mono', monospace;
+            transition: background 0.2s ease;
+        }
+
+        .lb-row:last-child { border-bottom: none; }
+        .lb-row:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .lb-row.header-row {
+            background: rgba(0, 0, 0, 0.4);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .lb-row.user-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+
+        .lb-rank {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        .lb-rank.top-1 { color: #f59e0b; font-size: 1.2rem; }
+        .lb-rank.top-2 { color: #cbd5e1; font-size: 1.1rem; }
+        .lb-rank.top-3 { color: #b45309; font-size: 1.1rem; }
+
+        .lb-user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lb-terramon-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .lb-username {
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: #fff;
+        }
+
+        .lb-user-tag {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            background: var(--accent);
+            color: #000;
+            border-radius: 3px;
+            font-weight: 800;
+            margin-left: 8px;
+        }
+
+        .lb-stat-badge {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--exp-blue);
+        }
+
+        .lb-substat {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- STICKY BOTTOM USER RANK BAR --- */
+        .user-rank-sticky-bar {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: rgba(10, 10, 14, 0.95);
+            border-top: 2px solid var(--accent);
+            backdrop-filter: blur(20px);
+            z-index: 9000;
+            padding: 14px 4%;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rank-bar-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .rank-bar-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--accent);
+            background: #000;
+        }
+
+        .rank-bar-title {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .rank-bar-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .rank-bar-highlight {
+            color: var(--accent);
+        }
+
+        .rank-bar-blue {
+            color: var(--exp-blue);
+        }
+
+        .rank-divider {
+            width: 1px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 300000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #register-modal, #register-modal *,
+        #create-modal, #create-modal *,
+        #attendees-modal, #attendees-modal *,
+        #terramon-selector-modal, #terramon-selector-modal *,
+        #terramon-detail-modal, #terramon-detail-modal *,
+        #auth-gate-overlay, #auth-gate-overlay * {
+            cursor: auto !important;
+        }
+
+        #register-modal input, #register-modal textarea,
+        #create-modal input, #create-modal textarea {
+            cursor: text !important;
+        }
+
+        #register-modal button,
+        #create-modal button,
+        #attendees-modal button,
+        #terramon-selector-modal button,
+        #terramon-detail-modal button,
+        .terramon-card, .pokedex-card.unlocked, .lb-toggle-btn {
+            cursor: pointer !important;
+        }
+
+        .modal-card {
+            background: #0d0d0f;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 35px;
+            width: 90%;
+            max-width: 520px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover { color: #fff; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: #141417;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+
+        .attendee-list-wrapper {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #141417;
+            padding: 8px;
+            margin: 15px 0 20px 0;
+        }
+
+        .attendee-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            gap: 10px;
+        }
+
+        .attendee-item:last-child { border-bottom: none; }
+
+        .item-actions { display: flex; gap: 6px; }
+
+        .btn-mini-joined {
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--exp-blue);
+            color: var(--exp-blue);
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.65rem;
+            border-radius: 3px;
+        }
+
+        .btn-mini-absent {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 4px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.65rem;
+            border-radius: 3px;
+        }
+
+        /* --- TERRAMON SELECTION GRID IN MODAL --- */
+        .terramon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .terramon-card {
+            background: #141417;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .terramon-card:hover {
+            border-color: var(--exp-blue);
+            transform: translateY(-3px);
+        }
+
+        .terramon-card.active-selected {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .terramon-card img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .terramon-card-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .terramon-card-level {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--exp-blue);
+        }
+
+        .active-badge-pill {
+            position: absolute;
+            top: 6px; right: 6px;
+            background: var(--accent);
+            color: #000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        footer { 
+            padding: 40px 0; 
+            text-align: center; 
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-left: 260px;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 200px; }
+            .content-area { margin-left: 200px; width: calc(100% - 200px); }
+            footer { margin-left: 200px; }
+            .user-rank-sticky-bar { left: 200px; flex-wrap: wrap; gap: 10px; padding: 10px; }
+            .exp-hud-container { width: 168px; }
+            .terramon-grid { grid-template-columns: 1fr; }
+            .pokedex-grid { grid-template-columns: 1fr; }
+            .lb-row { grid-template-columns: 50px 1fr 100px 120px; padding: 12px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">NEBULA</a>
+        <div class="nav-links">
+            <a href="origins.html">Origins</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="history.html">History</a>
+            <a href="features.html">Features</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="events.html" class="active">Events</a>
+            <a href="login.html?return=events.html" class="auth-btn" id="authNavBtn">LOGIN</a>
+        </div>
+    </nav>
+
+    <div id="auth-gate-overlay">
+        <p class="auth-gate-msg"><strong>// CLEARANCE REQUIRED</strong><br>Log in with your email to access Community Events.</p>
+        <a href="login.html?return=events.html" class="auth-btn">LOGIN</a>
+    </div>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div class="app-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">// COMMUNITY NAV</div>
+            <button class="sidebar-tab active" onclick="switchTab('main-dashboard', this)">Main Dashboard</button>
+            <button class="sidebar-tab" onclick="switchTab('signed-up-for', this)">Signed up for</button>
+            <button class="sidebar-tab" onclick="switchTab('terramon', this)">TERRAMON Index</button>
+            <button class="sidebar-tab" onclick="switchTab('terramon-leaderboard', this)">TERRAMON Leaderboard</button>
+
+            <div class="exp-hud-container">
+                <div class="level-mascot" id="levelMascotFrame" onclick="openTerramonSelectorModal()" title="Click to open TERRAMON selection window!">
+                    <span class="mascot-hint">⚡ CLICK TO SELECT</span>
+                    <img id="mascotImage" src="" alt="TERRAMON">
+                </div>
+
+                <div class="exp-hud" id="expHud">
+                    <div class="exp-hud-header">
+                        <span class="level-badge" id="levelDisplay">LVL 1</span>
+                        <span class="exp-text" id="expTextDisplay">0 / 5 EXP</span>
+                    </div>
+                    <div class="exp-track">
+                        <div class="exp-fill" id="expFillBar"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+
+            <div id="main-dashboard" class="tab-content active">
+                <span class="header-tag">// COMMUNITY_HUB</span>
+                <h1 class="page-title">Community Events</h1>
+                <p class="subtitle">Showing activities available for registration and upcoming events hosted by you.</p>
+
+                <div class="filter-panel">
+                    <div class="target-time-wrapper">
+                        <span class="filter-label">Target Time:</span>
+                        <button class="time-picker-trigger" id="timeTrigger" onclick="toggleCalendar(event)">
+                            📅 <span id="selectedTimeDisplay">INITIALIZING...</span>
+                        </button>
+                    </div>
+
+                    <button class="action-btn" onclick="openModal('create-modal')">+ HOST AN EVENT</button>
+                </div>
+
+                <div class="calendar-dropdown" id="calendarDropdown" tabindex="0">
+                    <div class="calendar-nav">
+                        <button class="cal-btn" onclick="changeMonth(-1, event)">◀</button>
+                        <span class="cal-month-title" id="monthDisplay">MONTH YEAR</span>
+                        <button class="cal-btn" onclick="changeMonth(1, event)">▶</button>
+                    </div>
+
+                    <div class="calendar-grid" id="calendarGrid"></div>
+
+                    <div class="time-select-row">
+                        <span class="filter-label">Time:</span>
+                        <div class="time-controls">
+                            <select id="hourSelect" class="time-select" onchange="updateSelectedTime(event)"></select>
+                            <span style="font-family: 'JetBrains Mono';">:</span>
+                            <select id="minuteSelect" class="time-select" onchange="updateSelectedTime(event)"></select>
+                            <select id="ampmSelect" class="time-select" onchange="updateSelectedTime(event)">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="cal-confirm-bar">
+                        <button class="lock-btn" onclick="lockInTargetTime(event)">LOCK IN TIME</button>
+                    </div>
+                </div>
+
+                <div class="events-grid" id="eventsGrid"></div>
+            </div>
+
+            <div id="signed-up-for" class="tab-content">
+                <span class="header-tag">// MY_SCHEDULE</span>
+                <h1 class="page-title">Signed Up & Hosted Events</h1>
+                <p class="subtitle">Click on any <strong style="color:var(--exp-blue)">COMPLETED</strong> activity to claim your EXP explosion!</p>
+                <div class="events-grid" id="signedUpGrid"></div>
+            </div>
+
+            <div id="terramon" class="tab-content">
+                <span class="header-tag">// TERRAMON_INDEX</span>
+                <h1 class="page-title">TERRAMON Index</h1>
+                <p class="subtitle">Catalog of available network monitoring entities and their evolution forms. Earn EXP to unlock higher evolutions.</p>
+                
+                <div class="pokedex-grid" id="pokedexGrid"></div>
+            </div>
+
+            <div id="terramon-leaderboard" class="tab-content">
+                <span class="header-tag">// RANKINGS</span>
+                <h1 class="page-title">TERRAMON Leaderboard</h1>
+                <p class="subtitle">Top network maintainers ranked by individual TERRAMON strength or total squad performance.</p>
+                
+                <div class="leaderboard-toggle-bar">
+                    <button class="lb-toggle-btn active" id="btnLbSingles" onclick="switchLeaderboardMode('singles')">👤 Singles Leaderboard</button>
+                    <button class="lb-toggle-btn" id="btnLbSquad" onclick="switchLeaderboardMode('squad')">👥 Squad Leaderboard</button>
+                </div>
+
+                <div class="leaderboard-table-container" id="leaderboardContainer"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="user-rank-sticky-bar" id="userRankBottomBar" style="display: none;">
+        <div class="rank-bar-section">
+            <img src="" id="userBarAvatar" class="rank-bar-avatar" alt="Your Active Terramon">
+            <div>
+                <div class="rank-bar-title">// YOUR LEADERBOARD PROFILE</div>
+                <div class="rank-bar-value"><span class="rank-bar-highlight">YOU</span> (<span id="userBarTerramonName">Terramon</span>)</div>
+            </div>
+        </div>
+
+        <div class="rank-divider"></div>
+
+        <div class="rank-bar-section">
+            <div>
+                <div class="rank-bar-title">SINGLES RANKING</div>
+                <div class="rank-bar-value"><span class="rank-bar-highlight" id="userBarSinglesRank">#--</span> | LVL <span id="userBarSinglesLvl">1</span> <span class="rank-bar-blue" id="userBarSinglesExp">(0/5 EXP)</span></div>
+            </div>
+        </div>
+
+        <div class="rank-divider"></div>
+
+        <div class="rank-bar-section">
+            <div>
+                <div class="rank-bar-title">SQUAD RANKING</div>
+                <div class="rank-bar-value"><span class="rank-bar-highlight" id="userBarSquadRank">#--</span> | LVL <span id="userBarSquadLvl">3</span> <span class="rank-bar-blue" id="userBarSquadExp">(0 Total EXP)</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="terramon-selector-modal">
+        <div class="modal-card" style="max-width: 640px;">
+            <button class="modal-close" onclick="closeModal('terramon-selector-modal')">✕</button>
+            <h2 class="modal-title">Select Active TERRAMON</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Choose which TERRAMON you want active. Each TERRAMON retains its own level & EXP level bar.</p>
+
+            <div class="terramon-grid" id="terramonSelectorGrid"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="terramon-detail-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('terramon-detail-modal')">✕</button>
+            <h2 class="modal-title" id="detailModalTitle">TERRAMON ENTRY</h2>
+            <div id="detailModalBody"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="register-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
+            <h2 class="modal-title" id="modalEventTitle">Event Registration</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Confirm your attendance to reserve a slot.</p>
+            
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regFullName" required placeholder="e.g. Alex Morgan">
+                </div>
+                <button type="submit" class="action-btn" style="width: 100%; margin-top: 10px;">CONFIRM REGISTRATION</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('create-modal')">✕</button>
+            <h2 class="modal-title">Host a Community Event</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Submit your environmental workshop or symposium proposal.</p>
+            
+            <form onsubmit="handleCreateEvent(event)">
+                <div class="form-group">
+                    <label>Event Title</label>
+                    <input type="text" id="newEventTitle" required placeholder="e.g. Local Air Monitoring Node">
+                </div>
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="newEventDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Location Name</label>
+                    <input type="text" id="newEventLocation" required placeholder="e.g. Penang Science Cluster">
+                </div>
+                <div class="form-group">
+                    <label>Brief Description</label>
+                    <textarea id="newEventDesc" rows="3" required placeholder="Summarize key topics..."></textarea>
+                </div>
+                <button type="submit" class="action-btn" style="width: 100%; margin-top: 10px;">SUBMIT PROPOSAL</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="attendees-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('attendees-modal')">✕</button>
+            <h2 class="modal-title" id="attendeesModalTitle">Activity Roster</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;" id="attendeesModalMeta"></p>
+
+            <div class="attendee-list-wrapper" id="attendeesList"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p style="font-family: 'JetBrains Mono'; color: #FFF; font-size: 0.8rem; letter-spacing: 2px;">
+            © 2026 NEBULA TRADEMARK // ALL RIGHTS RESERVED
+        </p>
+    </footer>
+
+    <script>
+        let activeRegisterEventId = null;
+        let activeAttendeesEventId = null;
+        let activeLeaderboardMode = 'singles';
+
+        /* --- ACCURATE FORMULA FOR EXP RATIOS --- */
+        function getMaxExpForLevel(lvl) {
+            return Math.round(5 * Math.pow(1.5, lvl - 1));
+        }
+
+        function calculateCumulativeExp(lvl, currentExp) {
+            let total = 0;
+            for (let i = 1; i < lvl; i++) {
+                total += getMaxExpForLevel(i);
+            }
+            return total + currentExp;
+        }
+
+        /* --- 3 INDEPENDENT TERRAMON DATA STRUCTURE --- */
+        let activeMascotIndex = loadActiveMascotIndex();
+        let mascotList = loadMascotList();
+
+        function loadActiveMascotIndex() {
+            const saved = localStorage.getItem('nebula_active_mascot_idx');
+            return saved !== null ? parseInt(saved, 10) : 0;
+        }
+
+        function loadMascotList() {
+            const saved = localStorage.getItem('nebula_mascots_data_v2');
+            if (saved) return JSON.parse(saved);
+
+            return [
+                {
+                    id: "terramon_a",
+                    name: "TERRAMON ALPHA",
+                    level: 1,
+                    currentExp: 0,
+                    maxExp: getMaxExpForLevel(1),
+                    stages: {
+                        stage1: { name: "TERRAMON ALPHA (BASIC)", src: "https://picsum.photos/seed/nebula_a1/300/200", desc: "Base environmental monitoring node." },
+                        stage2: { name: "TERRAMON ALPHA II (EVO)", src: "https://picsum.photos/seed/nebula_a2/300/200", desc: "Enhanced sensing array with particulate tracking." },
+                        stage3: { name: "TERRAMON ALPHA PRIME", src: "https://picsum.photos/seed/nebula_a3/300/200", desc: "Apex ecological sentinel with predictive atmospheric AI." }
+                    }
+                },
+                {
+                    id: "terramon_b",
+                    name: "TERRAMON BETA",
+                    level: 1,
+                    currentExp: 0,
+                    maxExp: getMaxExpForLevel(1),
+                    stages: {
+                        stage1: { name: "TERRAMON BETA (BASIC)", src: "https://picsum.photos/seed/nebula_b1/300/200", desc: "Aquatic network telemetric probe." },
+                        stage2: { name: "TERRAMON BETA II (EVO)", src: "https://picsum.photos/seed/nebula_b2/300/200", desc: "Deep water quality testing and marine sensor suite." },
+                        stage3: { name: "TERRAMON BETA PRIME", src: "https://picsum.photos/seed/nebula_b3/300/200", desc: "Hydro-ecological core with ocean current analysis." }
+                    }
+                },
+                {
+                    id: "terramon_c",
+                    name: "TERRAMON GAMMA",
+                    level: 1,
+                    currentExp: 0,
+                    maxExp: getMaxExpForLevel(1),
+                    stages: {
+                        stage1: { name: "TERRAMON GAMMA (BASIC)", src: "https://picsum.photos/seed/nebula_c1/300/200", desc: "Soil biomass monitor and seismic probe." },
+                        stage2: { name: "TERRAMON GAMMA II (EVO)", src: "https://picsum.photos/seed/nebula_c2/300/200", desc: "Geothermal radiation and soil health analyzer." },
+                        stage3: { name: "TERRAMON GAMMA PRIME", src: "https://picsum.photos/seed/nebula_c3/300/200", desc: "Tectonic environmental shield and biome overseer." }
+                    }
+                }
+            ];
+        }
+
+        function saveMascotState() {
+            localStorage.setItem('nebula_active_mascot_idx', activeMascotIndex);
+            localStorage.setItem('nebula_mascots_data_v2', JSON.stringify(mascotList));
+        }
+
+        /* --- ACCURATE MOCK COMPETITOR STATS --- */
+        const leaderboardCompetitors = [
+            { username: "CyberRanger", topLevel: 22, topExp: 1400, topImg: "https://picsum.photos/seed/nebula_a3/300/200", squadLevel: 58, squadExp: 42000 },
+            { username: "AeroKnight", topLevel: 19, topExp: 850, topImg: "https://picsum.photos/seed/nebula_b3/300/200", squadLevel: 45, squadExp: 31000 },
+            { username: "BioShield", topLevel: 15, topExp: 420, topImg: "https://picsum.photos/seed/nebula_c2/300/200", squadLevel: 39, squadExp: 22000 },
+            { username: "NeonPulse", topLevel: 12, topExp: 150, topImg: "https://picsum.photos/seed/nebula_a2/300/200", squadLevel: 31, squadExp: 14000 },
+            { username: "SolarVanguard", topLevel: 8, topExp: 50, topImg: "https://picsum.photos/seed/nebula_b2/300/200", squadLevel: 21, squadExp: 5000 }
+        ];
+
+        function switchLeaderboardMode(mode) {
+            activeLeaderboardMode = mode;
+            document.getElementById('btnLbSingles').classList.toggle('active', mode === 'singles');
+            document.getElementById('btnLbSquad').classList.toggle('active', mode === 'squad');
+            renderLeaderboard();
+        }
+
+        function getUserLeaderboardStats() {
+            let highestTerramon = mascotList[0];
+            mascotList.forEach(tm => {
+                if (tm.level > highestTerramon.level || (tm.level === highestTerramon.level && tm.currentExp > highestTerramon.currentExp)) {
+                    highestTerramon = tm;
+                }
+            });
+
+            const squadLvlSum = mascotList.reduce((sum, tm) => sum + tm.level, 0);
+            const squadExpSum = mascotList.reduce((sum, tm) => sum + calculateCumulativeExp(tm.level, tm.currentExp), 0);
+
+            return {
+                username: "You",
+                isUser: true,
+                topLevel: highestTerramon.level,
+                topExp: highestTerramon.currentExp,
+                topMaxExp: getMaxExpForLevel(highestTerramon.level),
+                topImg: getTerramonImageForLevel(highestTerramon),
+                topName: highestTerramon.name,
+                squadLevel: squadLvlSum,
+                squadExp: squadExpSum
+            };
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container) return;
+
+            const userData = getUserLeaderboardStats();
+            
+            // Build singles ranking list
+            let singlesEntries = [...leaderboardCompetitors.map(c => ({
+                ...c,
+                topMaxExp: getMaxExpForLevel(c.topLevel)
+            })), userData];
+            singlesEntries.sort((a, b) => b.topLevel - a.topLevel || b.topExp - a.topExp);
+            const singlesRank = singlesEntries.findIndex(e => e.isUser) + 1;
+
+            // Build squad ranking list
+            let squadEntries = [...leaderboardCompetitors, userData];
+            squadEntries.sort((a, b) => b.squadLevel - a.squadLevel || b.squadExp - a.squadExp);
+            const squadRank = squadEntries.findIndex(e => e.isUser) + 1;
+
+            // Update Sticky Bottom Bar
+            const barAvatar = document.getElementById('userBarAvatar');
+            const barTerramonName = document.getElementById('userBarTerramonName');
+            const barSinglesRank = document.getElementById('userBarSinglesRank');
+            const barSinglesLvl = document.getElementById('userBarSinglesLvl');
+            const barSinglesExp = document.getElementById('userBarSinglesExp');
+            const barSquadRank = document.getElementById('userBarSquadRank');
+            const barSquadLvl = document.getElementById('userBarSquadLvl');
+            const barSquadExp = document.getElementById('userBarSquadExp');
+
+            if (barAvatar) barAvatar.src = userData.topImg;
+            if (barTerramonName) barTerramonName.textContent = userData.topName;
+            if (barSinglesRank) barSinglesRank.textContent = `#${singlesRank}`;
+            if (barSinglesLvl) barSinglesLvl.textContent = userData.topLevel;
+            if (barSinglesExp) barSinglesExp.textContent = `(${userData.topExp} / ${userData.topMaxExp} EXP)`;
+            if (barSquadRank) barSquadRank.textContent = `#${squadRank}`;
+            if (barSquadLvl) barSquadLvl.textContent = userData.squadLevel;
+            if (barSquadExp) barSquadExp.textContent = `(${userData.squadExp} Total EXP)`;
+
+            // Render current active leaderboard table
+            const activeEntries = activeLeaderboardMode === 'singles' ? singlesEntries : squadEntries;
+
+            let html = `
+                <div class="lb-row header-row">
+                    <div>RANK</div>
+                    <div>PLAYER / SENSOR NODE</div>
+                    <div>${activeLeaderboardMode === 'singles' ? 'HIGHEST TERRAMON' : 'SQUAD TOTAL'}</div>
+                    <div>${activeLeaderboardMode === 'singles' ? 'EXP / LEVEL RATIO' : 'CUMULATIVE EXP'}</div>
+                </div>
+            `;
+
+            activeEntries.forEach((entry, idx) => {
+                const rankNum = idx + 1;
+                let rankClass = "";
+                if (rankNum === 1) rankClass = "top-1";
+                else if (rankNum === 2) rankClass = "top-2";
+                else if (rankNum === 3) rankClass = "top-3";
+
+                const isUser = entry.isUser;
+                const levelVal = activeLeaderboardMode === 'singles' ? entry.topLevel : entry.squadLevel;
+                const expVal = activeLeaderboardMode === 'singles' ? `${entry.topExp} / ${entry.topMaxExp || getMaxExpForLevel(entry.topLevel)}` : `${entry.squadExp}`;
+
+                html += `
+                    <div class="lb-row ${isUser ? 'user-highlight' : ''}">
+                        <div class="lb-rank ${rankClass}">#${rankNum}</div>
+                        <div class="lb-user-info">
+                            ${activeLeaderboardMode === 'singles' ? `<img src="${entry.topImg}" class="lb-terramon-avatar" alt="Terramon">` : ''}
+                            <div>
+                                <span class="lb-username">${entry.username}</span>
+                                ${isUser ? '<span class="lb-user-tag">YOU</span>' : ''}
+                                ${activeLeaderboardMode === 'singles' && entry.topName ? `<div style="font-size:0.65rem; color:var(--text-muted);">${entry.topName}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="lb-stat-badge">LVL ${levelVal}</div>
+                        <div class="lb-substat">⚡ ${expVal} EXP</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        /* --- TERRAMON SELECTOR MODAL WINDOW --- */
+        function openTerramonSelectorModal() {
+            renderTerramonSelectorGrid();
+            openModal('terramon-selector-modal');
+        }
+
+        function selectTerramon(index) {
+            activeMascotIndex = index;
+            saveMascotState();
+            updateExpHudUI();
+            renderPokedexGrid();
+            renderLeaderboard();
+
+            const frame = document.getElementById('levelMascotFrame');
+            if (frame) {
+                frame.style.transform = 'scale(0.95)';
+                setTimeout(() => frame.style.transform = 'scale(1)', 150);
+            }
+
+            closeModal('terramon-selector-modal');
+        }
+
+        function getTerramonImageForLevel(item) {
+            if (item.level >= 16) return item.stages.stage3.src;
+            if (item.level >= 8) return item.stages.stage2.src;
+            return item.stages.stage1.src;
+        }
+
+        function renderTerramonSelectorGrid() {
+            const grid = document.getElementById('terramonSelectorGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            mascotList.forEach((tm, idx) => {
+                const isActive = idx === activeMascotIndex;
+                const card = document.createElement('div');
+                card.className = `terramon-card ${isActive ? 'active-selected' : ''}`;
+                card.onclick = () => selectTerramon(idx);
+
+                const imgSrc = getTerramonImageForLevel(tm);
+
+                card.innerHTML = `
+                    ${isActive ? '<span class="active-badge-pill">ACTIVE</span>' : ''}
+                    <img src="${imgSrc}" alt="${tm.name}">
+                    <div class="terramon-card-name">${tm.name}</div>
+                    <div class="terramon-card-level">LVL ${tm.level} (${tm.currentExp}/${tm.maxExp} EXP)</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        /* --- POKEDEX INDEX GENERATION & RENDER --- */
+        function renderPokedexGrid() {
+            const grid = document.getElementById('pokedexGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            let indexNumber = 1;
+
+            mascotList.forEach((tm, tmIdx) => {
+                const stageConfigs = [
+                    { stageKey: 'stage1', reqLvl: 1, label: 'STAGE 1 (BASIC)' },
+                    { stageKey: 'stage2', reqLvl: 8, label: 'STAGE 2 (EVO)' },
+                    { stageKey: 'stage3', reqLvl: 16, label: 'STAGE 3 (PRIME)' }
+                ];
+
+                stageConfigs.forEach(stg => {
+                    const stageData = tm.stages[stg.stageKey];
+                    const isUnlocked = tm.level >= stg.reqLvl;
+                    const numStr = `#${String(indexNumber).padStart(3, '0')}`;
+                    const isActiveMascot = tmIdx === activeMascotIndex;
+
+                    const card = document.createElement('div');
+                    card.className = `pokedex-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+
+                    if (isUnlocked) {
+                        card.onclick = () => openTerramonDetailModal(stageData, stg.label, numStr, tm, isUnlocked);
+                    }
+
+                    card.innerHTML = `
+                        <div class="pokedex-img-wrapper">
+                            <img src="${stageData.src}" alt="${stageData.name}">
+                            <span class="pokedex-index-num">${numStr}</span>
+                            ${!isUnlocked ? `<div class="lock-overlay-badge">🔒 UNLOCKS AT LVL ${stg.reqLvl}</div>` : ''}
+                        </div>
+                        <div class="pokedex-info-header">
+                            <span class="pokedex-name">${stageData.name}</span>
+                            <span class="pokedex-stage-tag ${isActiveMascot ? 'active-tag' : ''}">${stg.label}</span>
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                    indexNumber++;
+                });
+            });
+
+            bindHoverCursor();
+        }
+
+        function openTerramonDetailModal(stageData, stageLabel, indexNum, mascotObj, isUnlocked) {
+            const title = document.getElementById('detailModalTitle');
+            const body = document.getElementById('detailModalBody');
+
+            title.textContent = `${indexNum} // ${stageData.name}`;
+
+            body.innerHTML = `
+                <div style="margin-top: 15px;">
+                    <img src="${stageData.src}" style="width:100%; height:200px; object-fit:cover; border-radius:6px; border:1px solid var(--border-color); margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-family:'JetBrains Mono'; font-size:0.75rem;">
+                        <span style="color:var(--exp-blue);">${stageLabel}</span>
+                        <span style="color:var(--accent);">OWNER LEVEL: LVL ${mascotObj.level}</span>
+                    </div>
+                    <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.6; font-family:'Plus Jakarta Sans';">${stageData.desc}</p>
+                </div>
+            `;
+
+            openModal('terramon-detail-modal');
+        }
+
+        /* --- EXP SYSTEM LOGIC --- */
+        function addExp(amount) {
+            const mascot = mascotList[activeMascotIndex];
+            mascot.currentExp += amount;
+
+            while (mascot.currentExp >= mascot.maxExp) {
+                mascot.currentExp -= mascot.maxExp;
+                mascot.level += 1;
+                mascot.maxExp = getMaxExpForLevel(mascot.level);
+                
+                const hud = document.getElementById('expHud');
+                if (hud) {
+                    hud.style.borderColor = '#38bdf8';
+                    hud.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.9)';
+                    setTimeout(() => {
+                        hud.style.borderColor = 'var(--border-color)';
+                        hud.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.5)';
+                    }, 1400);
+                }
+            }
+
+            saveMascotState();
+            updateExpHudUI();
+            renderPokedexGrid();
+            renderLeaderboard();
+        }
+
+        function updateExpHudUI() {
+            const mascot = mascotList[activeMascotIndex];
+            mascot.maxExp = getMaxExpForLevel(mascot.level);
+
+            const levelDisplay = document.getElementById('levelDisplay');
+            const expTextDisplay = document.getElementById('expTextDisplay');
+            const expFillBar = document.getElementById('expFillBar');
+
+            if (levelDisplay && expTextDisplay && expFillBar) {
+                levelDisplay.textContent = `LVL ${mascot.level}`;
+                expTextDisplay.textContent = `${mascot.currentExp} / ${mascot.maxExp} EXP`;
+                
+                const percentage = Math.min(100, Math.max(0, (mascot.currentExp / mascot.maxExp) * 100));
+                expFillBar.style.width = `${percentage}%`;
+            }
+
+            const targetSrc = getTerramonImageForLevel(mascot);
+            const mascotImg = document.getElementById('mascotImage');
+
+            if (mascotImg && mascotImg.src !== targetSrc) {
+                mascotImg.style.opacity = '0';
+                setTimeout(() => {
+                    mascotImg.src = targetSrc;
+                    mascotImg.style.opacity = '1';
+                }, 150);
+            }
+        }
+
+        /* --- BLUE PARTICLE EXPLOSION EFFECT --- */
+        function triggerBlueParticleExplosion(startElement, expAmount = 10, onCompleteCallback = null) {
+            const rect = startElement.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+
+            const targetHud = document.getElementById('expHud');
+            const hudRect = targetHud.getBoundingClientRect();
+            const targetX = hudRect.left + hudRect.width / 2;
+            const targetY = hudRect.top + hudRect.height / 2;
+
+            const particleCount = 28;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'blue-particle';
+                document.body.appendChild(particle);
+
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+
+                const angle = Math.random() * Math.PI * 2;
+                const burstDistance = Math.random() * 90 + 30;
+                const burstX = startX + Math.cos(angle) * burstDistance;
+                const burstY = startY + Math.sin(angle) * burstDistance;
+
+                requestAnimationFrame(() => {
+                    particle.style.transform = `translate(${burstX - startX}px, ${burstY - startY}px) scale(1.4)`;
+                    
+                    setTimeout(() => {
+                        particle.style.transition = 'transform 0.6s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.6s ease';
+                        particle.style.transform = `translate(${targetX - startX}px, ${targetY - startY}px) scale(0.2)`;
+                        particle.style.opacity = '0.2';
+
+                        setTimeout(() => {
+                            particle.remove();
+                            if (i === particleCount - 1) {
+                                addExp(expAmount);
+                                if (typeof onCompleteCallback === 'function') {
+                                    onCompleteCallback();
+                                }
+                            }
+                        }, 600);
+                    }, 250 + Math.random() * 150);
+                });
+            }
+        }
+
+        /* --- LocalStorage Events Sync --- */
+        function loadEventsFromStorage() {
+            const stored = localStorage.getItem('nebula_events_v3');
+            if (stored) return JSON.parse(stored);
+
+            const defaults = [
+                {
+                    id: 1,
+                    title: "Air Quality Sensor Deployment Workshop",
+                    timestamp: new Date("2026-08-10T14:00:00").getTime(),
+                    dateDisplay: "AUG 10, 2026 // 02:00 PM",
+                    location: "Bayan Lepas Community Center",
+                    desc: "Hands-on session assembling low-cost particulate monitoring nodes for real-time local air reporting.",
+                    attendees: 3,
+                    attendeeList: [
+                        { name: "Alex Morgan", isHost: false, status: "Pending" },
+                        { name: "Sarah Chen", isHost: false, status: "Pending" },
+                        { name: "You (Host)", isHost: true, status: "Host" }
+                    ],
+                    isSignedUp: false,
+                    isUserHost: true,
+                    attendanceStatus: "Pending",
+                    isClaimed: false
+                },
+                {
+                    id: 2,
+                    title: "Coastal Ecosystem Smoke Resilience Forum",
+                    timestamp: new Date("2026-08-05T10:00:00").getTime(),
+                    dateDisplay: "AUG 05, 2026 // 10:00 AM",
+                    location: "George Town Tech Hub",
+                    desc: "Discussion on mitigating air pollution impact on coastal vegetation and community health.",
+                    attendees: 3,
+                    attendeeList: [
+                        { name: "Jordan Lee (Host)", isHost: true, status: "Host" },
+                        { name: "Samantha Vance", isHost: false, status: "Pending" },
+                        { name: "You", isHost: false, status: "Completed" }
+                    ],
+                    isSignedUp: true,
+                    isUserHost: false,
+                    attendanceStatus: "Completed",
+                    isClaimed: false
+                },
+                {
+                    id: 3,
+                    title: "Community Clean-Up & Tree Planting",
+                    timestamp: new Date("2026-07-28T09:00:00").getTime(),
+                    dateDisplay: "JUL 28, 2026 // 09:00 AM",
+                    location: "Penang Botanical Gardens",
+                    desc: "TEST ACTIVITY: Completed environmental initiative ready for testing blue particle explosion and EXP rewards.",
+                    attendees: 12,
+                    attendeeList: [
+                        { name: "Eco Squad Host", isHost: true, status: "Host" },
+                        { name: "You", isHost: false, status: "Completed" }
+                    ],
+                    isSignedUp: true,
+                    isUserHost: false,
+                    attendanceStatus: "Completed",
+                    isClaimed: false
+                }
+            ];
+            localStorage.setItem('nebula_events_v3', JSON.stringify(defaults));
+            return defaults;
+        }
+
+        let events = loadEventsFromStorage();
+
+        function saveEventsToStorage() {
+            localStorage.setItem('nebula_events_v3', JSON.stringify(events));
+        }
+
+        /* --- Real-Time Sync Listener --- */
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'nebula_events_v3' && e.newValue) {
+                events = JSON.parse(e.newValue);
+                sortAndRenderEvents();
+                renderSignedUpEvents();
+            }
+            if (e.key === 'nebula_mascots_data_v2' && e.newValue) {
+                mascotList = JSON.parse(e.newValue);
+                updateExpHudUI();
+                renderPokedexGrid();
+                renderLeaderboard();
+            }
+            if (e.key === 'nebula_active_mascot_idx' && e.newValue) {
+                activeMascotIndex = parseInt(e.newValue, 10);
+                updateExpHudUI();
+                renderPokedexGrid();
+                renderLeaderboard();
+            }
+        });
+
+        /* --- Sidebar Tab Switcher --- */
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.sidebar-tab').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+
+            const rankBar = document.getElementById('userRankBottomBar');
+            if (tabId === 'terramon-leaderboard') {
+                if (rankBar) rankBar.style.display = 'flex';
+                renderLeaderboard();
+            } else {
+                if (rankBar) rankBar.style.display = 'none';
+            }
+
+            if (tabId === 'signed-up-for') {
+                renderSignedUpEvents();
+            } else if (tabId === 'main-dashboard') {
+                sortAndRenderEvents();
+            } else if (tabId === 'terramon') {
+                renderPokedexGrid();
+            }
+        }
+
+        /* --- Custom Cursor Tracking --- */
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+            outline.style.left = e.clientX + 'px';
+            outline.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            outline.style.width = '32px';
+            outline.style.height = '32px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            outline.style.width = '40px';
+            outline.style.height = '40px';
+        });
+
+        /* --- Calendar & Time State --- */
+        const now = new Date();
+        let currentCalDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        let selectedDate = new Date(now);
+        let currentTargetTimestamp = now.getTime();
+
+        function initTimeSelectors() {
+            const hourSelect = document.getElementById('hourSelect');
+            const minuteSelect = document.getElementById('minuteSelect');
+            const ampmSelect = document.getElementById('ampmSelect');
+
+            hourSelect.innerHTML = '';
+            for (let i = 1; i <= 12; i++) {
+                const opt = document.createElement('option');
+                const val = String(i).padStart(2, '0');
+                opt.value = val;
+                opt.textContent = val;
+                hourSelect.appendChild(opt);
+            }
+
+            minuteSelect.innerHTML = '';
+            for (let i = 0; i < 60; i++) {
+                const opt = document.createElement('option');
+                const val = String(i).padStart(2, '0');
+                opt.value = val;
+                opt.textContent = val;
+                minuteSelect.appendChild(opt);
+            }
+
+            let rawHours = now.getHours();
+            let hours12 = rawHours % 12 || 12;
+            let ampm = rawHours >= 12 ? 'PM' : 'AM';
+            let minutes = now.getMinutes();
+
+            hourSelect.value = String(hours12).padStart(2, '0');
+            minuteSelect.value = String(minutes).padStart(2, '0');
+            ampmSelect.value = ampm;
+        }
+
+        function toggleCalendar(e) {
+            e.stopPropagation();
+            const cal = document.getElementById('calendarDropdown');
+            const trigger = document.getElementById('timeTrigger');
+            
+            if (!cal.classList.contains('active')) {
+                const rect = trigger.getBoundingClientRect();
+                cal.style.top = `${rect.top}px`;
+                cal.style.left = `${rect.right + 15}px`;
+
+                if (rect.right + 335 > window.innerWidth) {
+                    cal.style.left = `${rect.left}px`;
+                    cal.style.top = `${rect.bottom + 10}px`;
+                }
+
+                cal.classList.add('active');
+                cal.focus();
+            } else {
+                cal.classList.remove('active');
+            }
+        }
+
+        function lockInTargetTime(e) {
+            if (e) e.stopPropagation();
+            const cal = document.getElementById('calendarDropdown');
+            const trigger = document.getElementById('timeTrigger');
+
+            trigger.classList.add('locked');
+            setTimeout(() => trigger.classList.remove('locked'), 1200);
+
+            cal.classList.remove('active');
+            updateSelectedTime();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const cal = document.getElementById('calendarDropdown');
+            if (e.key === 'Enter' && cal && cal.classList.contains('active')) {
+                e.preventDefault();
+                lockInTargetTime(e);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const cal = document.getElementById('calendarDropdown');
+            if (cal && !cal.contains(e.target) && !e.target.closest('#timeTrigger')) {
+                cal.classList.remove('active');
+            }
+        });
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthDisplay = document.getElementById('monthDisplay');
+            grid.innerHTML = '';
+
+            const year = currentCalDate.getFullYear();
+            const month = currentCalDate.getMonth();
+
+            const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+            monthDisplay.textContent = `${monthNames[month]} ${year}`;
+
+            const days = ["S", "M", "T", "W", "T", "F", "S"];
+            days.forEach(d => {
+                const header = document.createElement('div');
+                header.className = 'cal-day-header';
+                header.textContent = d;
+                grid.appendChild(header);
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'cal-day empty';
+                grid.appendChild(empty);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'cal-day';
+                dayEl.textContent = day;
+
+                if (selectedDate && 
+                    selectedDate.getFullYear() === year && 
+                    selectedDate.getMonth() === month && 
+                    selectedDate.getDate() === day) {
+                    dayEl.classList.add('active');
+                }
+
+                dayEl.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedDate = new Date(year, month, day);
+                    renderCalendar();
+                    updateSelectedTime();
+                };
+
+                grid.appendChild(dayEl);
+            }
+        }
+
+        function changeMonth(offset, e) {
+            if (e) e.stopPropagation();
+            currentCalDate.setMonth(currentCalDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        function updateSelectedTime(e) {
+            if (e) e.stopPropagation();
+            const hourStr = document.getElementById('hourSelect').value;
+            const minStr = document.getElementById('minuteSelect').value;
+            const ampmStr = document.getElementById('ampmSelect').value;
+
+            let h = parseInt(hourStr, 10);
+            if (ampmStr === 'PM' && h < 12) h += 12;
+            if (ampmStr === 'AM' && h === 12) h = 0;
+
+            const targetDate = new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                h,
+                parseInt(minStr, 10)
+            );
+
+            currentTargetTimestamp = targetDate.getTime();
+
+            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const monthStr = monthNames[selectedDate.getMonth()];
+            const dayStr = String(selectedDate.getDate()).padStart(2, '0');
+            const yearStr = selectedDate.getFullYear();
+
+            document.getElementById('selectedTimeDisplay').textContent = `${monthStr} ${dayStr}, ${yearStr} // ${hourStr}:${minStr} ${ampmStr}`;
+            
+            sortAndRenderEvents();
+            renderSignedUpEvents();
+        }
+
+        function getReadableTimeDiff(ms) {
+            const diffMin = Math.round(ms / (1000 * 60));
+            const hours = Math.floor(diffMin / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days}d ${hours % 24}h`;
+            if (hours > 0) return `${hours}h ${diffMin % 60}m`;
+            return `${diffMin}m`;
+        }
+
+        function sortAndRenderEvents() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+
+            const dashboardEvents = events.filter(evt => {
+                const isRegisterable = !evt.isUserHost && !evt.isSignedUp;
+                const isFutureHosted = evt.isUserHost && evt.timestamp >= currentTargetTimestamp;
+                return isRegisterable || isFutureHosted;
+            });
+
+            if (dashboardEvents.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-placeholder" style="grid-column: 1 / -1;">
+                        <span>// NO AVAILABLE REGISTRATION OR UPCOMING HOSTED ACTIVITIES</span>
+                    </div>
+                `;
+                return;
+            }
+
+            let upcomingEvents = [];
+            let pastEvents = [];
+
+            dashboardEvents.forEach(evt => {
+                if (evt.timestamp >= currentTargetTimestamp) {
+                    upcomingEvents.push(evt);
+                } else {
+                    pastEvents.push(evt);
+                }
+            });
+
+            upcomingEvents.sort((a, b) => a.timestamp - b.timestamp);
+            pastEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+            const sortedEvents = [...upcomingEvents, ...pastEvents];
+
+            sortedEvents.forEach(e => {
+                const isPassed = e.timestamp < currentTargetTimestamp;
+                const diffMs = Math.abs(e.timestamp - currentTargetTimestamp);
+                const durationStr = getReadableTimeDiff(diffMs);
+
+                const timeDiffText = isPassed 
+                    ? `⏱️ ${durationStr} already passed` 
+                    : `⏱️ ${durationStr} away`;
+
+                let actionButton = `<button class="btn-outline" onclick="openRegisterModal(${e.id})">REGISTER</button>`;
+                if (e.isUserHost) {
+                    actionButton = `<span class="host-badge">HOST (YOU)</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `event-card ${isPassed ? 'past-event' : ''}`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="card-header">
+                            <span class="time-diff-tag ${isPassed ? 'passed' : ''}">${timeDiffText}</span>
+                        </div>
+                        <h3 class="event-title">${e.title}</h3>
+                        <p class="event-desc">${e.desc}</p>
+                        <ul class="meta-list">
+                            <li>📅 Scheduled: ${e.dateDisplay}</li>
+                            <li>📌 Location: ${e.location}</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <span class="attendee-count">${e.attendees} MEMBERS</span>
+                        ${actionButton}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            bindHoverCursor();
+        }
+
+        function renderSignedUpEvents() {
+            const grid = document.getElementById('signedUpGrid');
+            grid.innerHTML = '';
+
+            const userActivities = events.filter(e => (e.isSignedUp || e.isUserHost) && !e.isClaimed);
+
+            if (userActivities.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-placeholder" style="grid-column: 1 / -1;">
+                        <span>// NO REGISTERED OR HOSTED ACTIVITIES YET</span>
+                    </div>
+                `;
+                return;
+            }
+
+            userActivities.forEach(e => {
+                let badgeClass = "pending";
+                let badgeText = e.attendanceStatus || "Pending";
+
+                if (e.attendanceStatus === "Completed") {
+                    badgeClass = "completed";
+                    badgeText = "Completed";
+                } else if (e.attendanceStatus === "Was Not Present") {
+                    badgeClass = "not-present";
+                    badgeText = "Was Not Present";
+                }
+
+                const card = document.createElement('div');
+                const isCompleted = e.attendanceStatus === "Completed";
+                
+                card.className = `event-card clickable ${isCompleted ? 'completed-claimable' : ''}`;
+                
+                card.onclick = () => {
+                    if (e.isUserHost) {
+                        openAttendeesModal(e.id);
+                    } else if (isCompleted && !card.dataset.claiming) {
+                        card.dataset.claiming = "true";
+                        card.classList.add('claiming-out');
+
+                        triggerBlueParticleExplosion(card, 10, () => {
+                            e.isClaimed = true;
+                            saveEventsToStorage();
+                            renderSignedUpEvents();
+                        });
+                    }
+                };
+
+                const roleBadge = e.isUserHost 
+                    ? `<span class="host-badge">HOST (YOU)</span>` 
+                    : `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
+
+                let footerText = `<span style="font-family:'JetBrains Mono'; font-size:0.7rem; color: var(--text-muted);">STATUS PENDING</span>`;
+                if (e.isUserHost) {
+                    footerText = `<span style="font-family:'JetBrains Mono'; font-size:0.7rem; color: var(--accent);">MANAGE ATTENDANCE →</span>`;
+                } else if (isCompleted) {
+                    footerText = `<span style="font-family:'JetBrains Mono'; font-size:0.7rem; color: var(--exp-blue); font-weight:800;">CLICK TO CLAIM EXP 💥</span>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="card-header">
+                            ${roleBadge}
+                            ${e.isUserHost ? '' : `<span class="status-badge ${badgeClass}">${badgeText}</span>`}
+                        </div>
+                        <h3 class="event-title">${e.title}</h3>
+                        <p class="event-desc">${e.desc}</p>
+                        <ul class="meta-list">
+                            <li>📅 Scheduled: ${e.dateDisplay}</li>
+                            <li>📌 Location: ${e.location}</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <span class="attendee-count">👥 ${e.attendees} JOINED</span>
+                        ${footerText}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            bindHoverCursor();
+        }
+
+        function openAttendeesModal(eventId) {
+            activeAttendeesEventId = eventId;
+            const evt = events.find(e => e.id === eventId);
+            if (!evt || !evt.isUserHost) return;
+
+            document.getElementById('attendeesModalTitle').textContent = evt.title;
+            document.getElementById('attendeesModalMeta').textContent = `Manage Participant Attendance`;
+
+            renderAttendeeRoster(evt);
+            openModal('attendees-modal');
+        }
+
+        function renderAttendeeRoster(evt) {
+            const listContainer = document.getElementById('attendeesList');
+            listContainer.innerHTML = '';
+
+            if (evt.attendeeList && evt.attendeeList.length > 0) {
+                evt.attendeeList.forEach((participant, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'attendee-item';
+
+                    let statusDisplay = '';
+
+                    if (participant.isHost) {
+                        statusDisplay = `<span style="color: var(--warning); font-size: 0.7rem; font-weight:700;">HOST (ORGANIZER)</span>`;
+                    } else {
+                        statusDisplay = `
+                            <div class="item-actions">
+                                <button class="btn-mini-joined" onclick="updateParticipantStatus(${index}, 'Completed')">JOINED</button>
+                                <button class="btn-mini-absent" onclick="updateParticipantStatus(${index}, 'Was Not Present')">ABSENT</button>
+                            </div>
+                        `;
+                    }
+
+                    item.innerHTML = `
+                        <div>
+                            <div>#${index + 1} ${participant.name}</div>
+                            <div style="font-size:0.65rem; color:var(--text-muted)">STATUS: ${participant.status}</div>
+                        </div>
+                        ${statusDisplay}
+                    `;
+                    listContainer.appendChild(item);
+                });
+            } else {
+                listContainer.innerHTML = `<div class="attendee-item" style="color: var(--text-muted)">No registered participants yet.</div>`;
+            }
+        }
+
+        function updateParticipantStatus(index, status) {
+            if (activeAttendeesEventId !== null) {
+                const evt = events.find(e => e.id === activeAttendeesEventId);
+                if (evt && evt.attendeeList[index] && !evt.attendeeList[index].isHost) {
+                    evt.attendeeList[index].status = status;
+                    evt.attendanceStatus = status;
+                    saveEventsToStorage();
+                    renderAttendeeRoster(evt);
+                    renderSignedUpEvents();
+                }
+            }
+        }
+
+        function bindHoverCursor() {
+            document.querySelectorAll('a, button, .cal-day, .event-card.clickable, .level-mascot, .terramon-card, .pokedex-card.unlocked, .lb-toggle-btn').forEach(el => {
+                el.addEventListener('mouseenter', () => outline.style.transform = 'translate(-50%, -50%) scale(1.3)');
+                el.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
+            });
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openRegisterModal(eventId) {
+            activeRegisterEventId = eventId;
+            const targetEvt = events.find(e => e.id === eventId);
+            if (targetEvt) {
+                document.getElementById('modalEventTitle').textContent = targetEvt.title;
+                openModal('register-modal');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('regFullName').value || "You";
+            
+            if (activeRegisterEventId !== null) {
+                const evt = events.find(item => item.id === activeRegisterEventId);
+                if (evt) {
+                    evt.isSignedUp = true;
+                    evt.attendees += 1;
+                    if (!evt.attendeeList) evt.attendeeList = [];
+                    evt.attendeeList.push({ name: fullName, isHost: false, status: "Pending" });
+                    evt.attendanceStatus = "Pending";
+                }
+            }
+
+            saveEventsToStorage();
+            closeModal('register-modal');
+            sortAndRenderEvents();
+            renderSignedUpEvents();
+        }
+
+        function handleCreateEvent(e) {
+            e.preventDefault();
+            const dateVal = new Date(document.getElementById('newEventDate').value);
+            
+            const newEvt = {
+                id: Date.now(),
+                title: document.getElementById('newEventTitle').value,
+                timestamp: dateVal.getTime(),
+                dateDisplay: dateVal.toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                location: document.getElementById('newEventLocation').value,
+                desc: document.getElementById('newEventDesc').value,
+                attendees: 1,
+                attendeeList: [{ name: "Other Member (Host)", isHost: true, status: "Host" }],
+                isSignedUp: false,
+                isUserHost: false,
+                attendanceStatus: "Pending",
+                isClaimed: false
+            };
+
+            events.push(newEvt);
+            saveEventsToStorage();
+            sortAndRenderEvents();
+            renderSignedUpEvents();
+            closeModal('create-modal');
+            e.target.reset();
+        }
+
+        /* --- AUTHENTICATION --- */
+        function checkAuthState() {
+            const activeUser = localStorage.getItem('nebula_active_user');
+            const authNavBtn = document.getElementById('authNavBtn');
+            const gateOverlay = document.getElementById('auth-gate-overlay');
+
+            if (activeUser) {
+                document.body.classList.remove('auth-locked');
+                gateOverlay.classList.remove('active');
+                authNavBtn.textContent = `[ ${activeUser.toUpperCase()} ]`;
+                authNavBtn.href = '#';
+                authNavBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (confirm("Disconnect session terminal?")) {
+                        localStorage.removeItem('nebula_active_user');
+                        checkAuthState();
+                    }
+                };
+            } else {
+                document.body.classList.add('auth-locked');
+                gateOverlay.classList.add('active');
+                authNavBtn.textContent = 'LOGIN';
+                authNavBtn.href = 'login.html?return=events.html';
+                authNavBtn.onclick = null;
+            }
+        }
+
+        function requireAuth(action) {
+            if (!localStorage.getItem('nebula_active_user')) {
+                alert('Clearance required. Please log in with your email first.');
+                window.location.href = 'login.html?return=events.html';
+                return false;
+            }
+            return true;
+        }
+
+        const _openModal = openModal;
+        openModal = function(modalId) {
+            if (!requireAuth()) return;
+            _openModal(modalId);
+        };
+
+        const _openRegisterModal = openRegisterModal;
+        openRegisterModal = function(eventId) {
+            if (!requireAuth()) return;
+            _openRegisterModal(eventId);
+        };
+
+        const _openTerramonSelectorModal = openTerramonSelectorModal;
+        openTerramonSelectorModal = function() {
+            if (!requireAuth()) return;
+            _openTerramonSelectorModal();
+        };
+
+        checkAuthState();
+
+        // Initialize UI components
+        initTimeSelectors();
+        renderCalendar();
+        updateSelectedTime();
+        updateExpHudUI();
+        renderPokedexGrid();
+        renderLeaderboard();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ORIGINS | NEBULA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #050505; --accent: #10b981; --danger: #ff3e3e; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
+        body { background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+
+        /* Higher Layer Cursor */
+        .cursor-dot { width: 8px; height: 8px; background: var(--accent); position: fixed; border-radius: 50%; pointer-events: none; z-index: 100001; }
+        .cursor-outline { width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5); position: fixed; border-radius: 50%; pointer-events: none; z-index: 100000; transition: transform 0.15s ease-out; }
+
+        /* Nav Fix */
+        .global-nav {
+            position: fixed; top: 0; width: 100%; padding: 25px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 9999;
+        }
+        .nav-logo { font-weight: 900; letter-spacing: 4px; color: #fff; font-size: 1.2rem; text-decoration: none; }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links a { color: #888; text-decoration: none; margin-left: 30px; font-family: 'JetBrains Mono'; font-size: 0.75rem; text-transform: uppercase; transition: color 0.3s ease; }
+        .nav-links a:hover { color: var(--accent); }
+        .auth-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            margin-left: 30px;
+            text-decoration: none;
+            cursor: pointer !important;
+        }
+        .auth-btn:hover {
+            background: var(--accent);
+            color: #000 !important;
+        }
+
+        /* Snap Scroll Layout */
+        .main-scroll { height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; }
+        section { height: 100vh; scroll-snap-align: start; position: relative; padding: 100px 8%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+        /* Animated Background Text */
+        .flow-text { position: absolute; white-space: nowrap; font-size: 15vh; font-weight: 800; opacity: 0.03; z-index: -1; animation: moveText 30s linear infinite; pointer-events: none; }
+        @keyframes moveText { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+        .label { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 12px; letter-spacing: 3px; display: block; margin-bottom: 10px; }
+        .module-desc { color: #666; font-size: 0.9rem; text-align: center; margin-bottom: 20px; max-width: 600px; }
+        h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -3px; text-align: center; line-height: 0.9; }
+
+        /* Full-Width Text (No Box, Bolded) */
+        .full-width-desc {
+            width: 100%;
+            max-width: 1200px;
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        /* The Grid */
+        .scanner-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1200px; 
+            margin-top: 10px;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scanner-box { 
+            height: 250px; 
+            border: 1px solid #111; 
+            padding: 30px; 
+            border-radius: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end; 
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #080808;
+            pointer-events: auto;
+            order: 0;
+            overflow: hidden;
+        }
+
+        .scanner-box:hover { border-color: var(--accent); background: rgba(16, 185, 129, 0.05); transform: translateY(-5px); }
+
+        /* Active Grid Layout when a box is expanded */
+        .scanner-grid.has-active {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Expanded State */
+        .scanner-box.expanded {
+            width: 100%;
+            height: auto;
+            min-height: 380px;
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            transform: none;
+            order: -1;
+            justify-content: flex-start;
+        }
+
+        /* Expanded Content Layout (Text + Image) */
+        .expanded-content {
+            display: none;
+            opacity: 0;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .scanner-box.expanded .expanded-content {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .expanded-text {
+            flex: 2;
+        }
+
+        .expanded-image {
+            flex: 1;
+            max-width: 320px;
+            height: 180px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Shrunken State */
+        .scanner-grid.has-active .scanner-box:not(.expanded) {
+            flex: 1 1 120px;
+            height: 140px;
+            padding: 15px 20px;
+            border-radius: 20px;
+            opacity: 0.6;
+        }
+
+        .scanner-grid.has-active .scanner-box:not(.expanded):hover {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
+        .scanner-grid.has-active .scanner-box:not(.expanded) p {
+            display: none;
+        }
+
+        /* Module 02 Vertical List Layout */
+        .shock-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        .shock-card-full {
+            width: 100%;
+            background: #0a0a0a;
+            border-radius: 20px;
+            padding: 46px 30px;
+            text-align: left;
+            border: 1px solid #111;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .shock-card-content {
+            flex: 0 0 320px;
+        }
+
+        .shock-card-full h3 {
+            font-size: 3.5rem;
+            color: var(--danger);
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .shock-placeholder {
+            flex: 1;
+            height: 100%;
+            min-height: 152px;
+            border: 1px dashed rgba(255, 62, 62, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 62, 62, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px 25px;
+            color: #bbb;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .shock-placeholder blockquote {
+            font-style: italic;
+            color: #ddd;
+        }
+
+        .shock-placeholder cite {
+            display: block;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: var(--danger);
+            font-style: normal;
+            letter-spacing: 1px;
+        }
+
+        .shock-placeholder cite a {
+            color: var(--danger);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .shock-placeholder cite a:hover {
+            color: #fff;
+        }
+
+        .learn-more-footer {
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #aaa;
+            border-top: 1px solid rgba(255, 62, 62, 0.2);
+            padding-top: 20px;
+        }
+
+        /* Specific interactive styles for Pipeline & Chain Reactions */
+        .pipeline-group {
+            margin-bottom: 40px;
+        }
+
+        .pipeline-step {
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: #080808;
+            border: 1px solid #111;
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        .pipeline-step:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .pipeline-step.expanded {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: var(--accent);
+            padding: 25px;
+        }
+
+        .pipeline-step .expanded-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .pipeline-step.expanded .expanded-content {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .call-to-action-text {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--accent);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .call-to-action-text a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            transition: opacity 0.3s ease;
+        }
+
+        .call-to-action-text a:hover {
+            opacity: 0.8;
+        }
+
+        footer { padding: 40px 0 60px 0; text-align: center; border-top: 1px solid #111; opacity: 0.5; font-family: 'JetBrains Mono'; font-size: 0.7rem; width: 100%; }
+
+        @media (max-width: 768px) {
+            .shock-card-full { flex-direction: column; align-items: stretch; padding: 30px 20px; }
+            .shock-card-content { flex: 1; }
+            section { height: auto; min-height: 100vh; padding: 120px 5%; }
+            .scanner-box.expanded .expanded-content,
+            .pipeline-step.expanded .expanded-content { flex-direction: column; }
+            .expanded-image { width: 100%; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="global-nav">
+        <a href="index.html" class="nav-logo">NEBULA</a>
+        <div class="nav-links">
+            <a href="origins.html">Origins</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="history.html">History</a>
+            <a href="features.html">Features</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="events.html">Events</a>
+            <a href="login.html?return=origins.html" class="auth-btn" id="authNavBtn">LOGIN</a>
+        </div>
+    </nav>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div class="main-scroll">
+        <section>
+            <div class="flow-text">MOLECULAR ANALYSIS TOXIN SCAN MONSOON FRICTION PEATLAND IGNITION</div>
+            <span class="label">// SYSTEM_ENTRY_POINT</span>
+            <p class="module-desc">System initialization and introductory telemetry breakdown.</p>
+            <h1>The <span style="color:var(--accent)">Origins.</span></h1>
+            <p style="color:#666; margin-top: 20px; text-align: center;">Investigating the catalysts of the 2026 atmospheric crisis.</p>
+        </section>
+
+        <section style="height: auto; min-height: 100vh;">
+            <span class="label">MODULE_00 // IGNOBLE_GASES</span>
+            <p class="module-desc">A deep-dive analysis into the chemical compounds and volatile particulates compromising air purity.</p>
+            
+            <p class="full-width-desc">
+                First let's understand what exactly our air pollution is made out of. In all honesty, it's made out of many things, far too many to list out. However, scientists have discovered 10 of the most prominent among the components of our smog.
+            </p>
+
+            <div class="scanner-grid">
+                <div class="scanner-box">
+                    <span class="label">GAS_01</span>
+                    <h2 style="color:var(--accent)">Carbon Monoxide (CO)</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">A toxic, odorless gas produced by the incomplete combustion of fuels in vehicles and industrial machinery. Interferes with oxygen transport in blood.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Inhaled carbon monoxide binds to hemoglobin with an affinity roughly 200 times higher than oxygen, forming carboxyhemoglobin. This prevents effective oxygen delivery throughout the human bloodstream, leading to headaches, tissue damage, and acute respiratory failure during severe atmospheric events.
+                        </div>
+                        <img src="https://www.fireengineering.com/wp-content/uploads/2019/10/carbon-monoxide-bohrer-1-1.jpg" alt="Carbon Monoxide Structure" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_02</span>
+                    <h2 style="color:var(--accent)">Nitrogen Oxides (NO<sub>x</sub>)</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Emitted mainly by motor vehicles and power plants. They contribute to acid rain and react with other gases to form harmful smog.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Consisting primarily of NO and NO2, nitrogen oxides act as key catalysts in the creation of secondary pollutants. When exposed to heat and sunlight, they break down to produce dangerous ground-level ozone, severely aggravating urban respiratory health and damaging surrounding vegetation.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_1" alt="Nitrogen Oxides Smog" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_03</span>
+                    <h2 style="color:var(--accent)">Sulfur Dioxide (SO<sub>2</sub>)</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Released when burning sulfur-containing fuels like coal and oil. Leading cause of acid rain.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Sulfur dioxide oxidizes in the atmosphere to form sulfurous and sulfuric acid. This leads directly to acid precipitation, causing chemical degradation of soil, acidifying freshwater bodies, and corroding metal and stone architecture across industrial cities.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_2" alt="Sulfur Dioxide Emissions" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_04</span>
+                    <h2 style="color:var(--accent)">Ozone (O<sub>3</sub>)</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Ground-level ozone formed when sunlight reacts with pollutants from vehicle and factory emissions. Major component of smog.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> While stratospheric ozone protects Earth from solar radiation, tropospheric (ground-level) ozone acts as an aggressive lung irritant. High concentrations trigger asthma, inflame airways, and drastically reduce agricultural crop yields during peak summer heatwaves.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_3" alt="Ozone Layer Reaction" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_05</span>
+                    <h2 style="color:var(--accent)">Ammonia (NH<sub>3</sub>)</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Mostly released from agricultural activities, like livestock farming and fertilizers. Reacts to form dangerous particulate matter.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Airborne ammonia interacts with nitric and sulfuric acids in the atmosphere to produce ammonium salts. These fine inorganic aerosols account for a substantial fraction of urban particulate pollution, contributing heavily to regional smog cover.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_4" alt="Ammonia Reactions" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_06</span>
+                    <h2 style="color:var(--accent)">VOCs</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Volatile Organic Compounds released from industrial processes, solvents, and fuel combustion. Contribute to smog and global warming.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> VOCs evaporate rapidly at standard room temperature. Beyond their direct toxic and carcinogenic effects on human exposure, VOCs interact with nitrogen oxides under solar radiation, multiplying tropospheric ozone formation and altering regional atmospheric chemistry.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_5" alt="VOC Industrial Emissions" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">GAS_07</span>
+                    <h2 style="color:var(--accent)">Greenhouse Gases</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">CO<sub>2</sub> and CH<sub>4</sub> spikes caused by human activities—such as deforestation, fossil fuel burning, and waste decomposition—driving global warming.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Massive increases in atmospheric carbon dioxide and methane trap infrared heat within the lower troposphere. This thermal blanket alters global circulation patterns, intensifies seasonal heat anomalies, and creates dry conditions that accelerate peatland combustion.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_6" alt="Greenhouse Effect Diagram" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">SCAN_01</span>
+                    <h2 style="color:var(--accent)">PM 2.5</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Particulates 30x smaller than hair. These cross the lung-blood barrier upon inhalation.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Due to their microscopic size (under 2.5 micrometers), these particles bypass nasal filtering mechanisms and lodge deep inside the pulmonary alveoli. From there, toxic heavy metals and chemical residue diffuse directly into systemic blood circulation.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_7" alt="PM 2.5 Particulate Inspection" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">SCAN_02</span>
+                    <h2 style="color:var(--accent)">Benzene</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Industrial byproduct trapped by thermal inversions. Highly carcinogenic molecular structure.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Benzene concentrations spike when stagnant air masses trap urban emissions near the surface. Long-term exposure damages bone marrow, suppresses immune response, and drastically elevates systemic risk for hematologic malignancies like leukemia.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_8" alt="Benzene Molecular Structure" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">SCAN_03</span>
+                    <h2 style="color:var(--accent)">Peat Smoke</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Carbon-heavy discharge from smoldering soil. Releases 10x more CO2 than wood fire.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Subsurface peat fires burn at lower temperatures with low oxygen, producing incomplete combustion. This generates dense plumes laden with carbon monoxide, complex polycyclic aromatic hydrocarbons, and fine tar droplets that travel hundreds of kilometers across marine corridors.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_9" alt="Peat Soil Smoldering Smoke" class="expanded-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section style="height: auto; min-height: 100vh;">
+            <span class="label">MODULE_01 // WHAT_CAUSES_THEM</span>
+            <p class="module-desc">Identifying the primary human activities and industrial mechanisms driving widespread pollution.</p>
+            
+            <p class="full-width-desc">
+                To solve atmospheric contamination, we must examine where these compounds originate. These primary drivers stem from a combination of unmonitored industrial growth, destructive land management practices, heavily concentrated urban transport networks, open waste disposal, and heavy construction dust.
+            </p>
+
+            <div class="scanner-grid">
+                <div class="scanner-box">
+                    <span class="label">CAUSE_01</span>
+                    <h2 style="color:var(--accent)">Industrial Emissions</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Heavy factory operations and power generation releasing unfiltered airborne effluents into the troposphere.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Unchecked manufacturing sectors continuously vent high volumes of sulfur dioxide, heavy metal particulates, and volatile organic compounds into regional air basins, compounding urban smog levels.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_5" alt="Industrial Emissions Source" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">CAUSE_02</span>
+                    <h2 style="color:var(--accent)">Peatland Deforestation</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Slash-and-burn clearing practices activating deep underground carbon fires across tropical soil beds.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Draining wetlands and igniting surface brush dries out carbon-dense peat layers below ground. Once ignited, these subsurface fires smolder indefinitely, producing massive particulate plumes.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_9" alt="Peat Forest Fire Cause" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">CAUSE_03</span>
+                    <h2 style="color:var(--accent)">Combustion Transit</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Fossil-fuel-powered vehicular gridlock concentrating nitrogen oxides within dense urban corridors.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> High vehicle density combined with urban canyon geography traps tailpipe gases close to street level, accelerating secondary pollutant reactions under daylight heat.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_1" alt="Vehicle Exhaust Emissions" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">CAUSE_04</span>
+                    <h2 style="color:var(--accent)">Open Waste Incineration</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Unregulated burning of municipal plastic and landfill waste releasing persistent toxic chemicals.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Low-temperature combustion of mixed synthetic waste and plastics emits highly carcinogenic dioxins, furans, and heavy metal particulates directly into residential microclimates.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_5" alt="Open Waste Incineration" class="expanded-image">
+                    </div>
+                </div>
+                <div class="scanner-box">
+                    <span class="label">CAUSE_05</span>
+                    <h2 style="color:var(--accent)">Construction & Fugitive Dust</h2>
+                    <p style="color:#888; margin-top: 10px; font-size: 0.9rem;">Uncontained earthwork, demolition, and mineral transport dispersing heavy particulate loads.</p>
+                    <div class="expanded-content">
+                        <div class="expanded-text">
+                            <strong>Extended Diagnostics:</strong> Large-scale infrastructure projects produce high concentrations of coarse airborne silica and mineral particles (PM10 and PM2.5), which degrade local air quality and aggravate respiratory conditions.
+                        </div>
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_7" alt="Construction Dust Dispersal" class="expanded-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section style="background: radial-gradient(circle at center, #1a0a0a 0%, #050505 100%); height: auto; min-height: 100vh;">
+            <span class="label" style="color:var(--danger)">MODULE_02 // IMPACT_STUDY</span>
+            <p class="module-desc">Quantitative metrics displaying public health tolls and global economic collateral.</p>
+            
+            <p class="full-width-desc">
+                The consequences of sustained toxic haze reach far beyond reduced visibility. Below are measured baseline indicators demonstrating the severe health risks, reduced life spans, and massive economic burdens imposed on populations worldwide.
+            </p>
+
+            <div class="shock-list">
+                <div class="shock-card-full">
+                    <div class="shock-card-content">
+                        <p style="color: #888; font-size: 0.85rem; font-family: 'JetBrains Mono';">METRIC_01 // TOXIC EQUIVALENCY</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #ccc;">KL Air Quality index peak exposure is equivalent to smoking</p>
+                        <h3>22</h3>
+                        <p style="color: var(--danger); font-family: 'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 1px;">CIGARETTES A DAY</p>
+                    </div>
+                    <div class="shock-placeholder">
+                        <blockquote>"Breathing air in regions affected by peak toxic haze is chemically equivalent to heavy smoking, exposing non-smokers to intense particulate hazards without consent."</blockquote>
+                        <cite>// <a href="https://www.reuters.com" target="_blank" rel="noopener noreferrer">REUTERS REPORTING ON REGIONAL AQI CRISES</a></cite>
+                    </div>
+                </div>
+
+                <div class="shock-card-full">
+                    <div class="shock-card-content">
+                        <p style="color: #888; font-size: 0.85rem; font-family: 'JetBrains Mono';">METRIC_02 // LIFE EXPECTANCY</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #ccc;">Average regional lifespan reduction due to PM 2.5 exposure</p>
+                        <h3>2.2</h3>
+                        <p style="color: var(--danger); font-family: 'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 1px;">YEARS PER PERSON</p>
+                    </div>
+                    <div class="shock-placeholder">
+                        <blockquote>"Air pollution remains the world’s greatest external risk to human health, stripping over two years off average global life expectancy."</blockquote>
+                        <cite>// <a href="https://aqli.epic.uchicago.edu/" target="_blank" rel="noopener noreferrer">AIR QUALITY LIFE INDEX (AQLI) / UNIVERSITY OF CHICAGO</a></cite>
+                    </div>
+                </div>
+
+                <div class="shock-card-full">
+                    <div class="shock-card-content">
+                        <p style="color: #888; font-size: 0.85rem; font-family: 'JetBrains Mono';">METRIC_03 // GLOBAL MORTALITY</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #ccc;">Premature deaths globally traced to outdoor air pollution annually</p>
+                        <h3>4.2M</h3>
+                        <p style="color: var(--danger); font-family: 'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 1px;">ANNUAL CASUALTIES</p>
+                    </div>
+                    <div class="shock-placeholder">
+                        <blockquote>"Ambient air pollution causes an estimated 4.2 million premature deaths worldwide per year due to stroke, heart disease, lung cancer and chronic respiratory illness."</blockquote>
+                        <cite>// <a href="https://www.who.int/teams/environment-climate-change-and-health/air-quality-energy-and-health/sectoral-interventions/ambient-air-pollution/health-risks" target="_blank" rel="noopener noreferrer">WORLD HEALTH ORGANIZATION (WHO) PUBLIC HEALTH ASSESSMENTS</a></cite>
+                    </div>
+                </div>
+
+                <div class="shock-card-full">
+                    <div class="shock-card-content">
+                        <p style="color: #888; font-size: 0.85rem; font-family: 'JetBrains Mono';">METRIC_04 // ECONOMIC DRAIN</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #ccc;">Global health and labor productivity costs caused by toxic haze</p>
+                        <h3>$8.1T</h3>
+                        <p style="color: var(--danger); font-family: 'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 1px;">GLOBAL COST / YEAR</p>
+                    </div>
+                    <div class="shock-placeholder">
+                        <blockquote>"The health damages caused by air pollution amount to $8.1 trillion a year, equivalent to 6.1 percent of global GDP."</blockquote>
+                        <cite>// <a href="https://openknowledge.worldbank.org/entities/publication/08d593ea-45dd-53b4-990d-0f5336edf4fd" target="_blank" rel="noopener noreferrer">WORLD BANK GLOBAL ECONOMIC HEALTH IMPACT REPORT</a></cite>
+                    </div>
+                </div>
+            </div>
+
+            <p class="learn-more-footer">Want to learn more? Visit the websites quoted for more information.</p>
+        </section>
+
+        <section style="height: auto; min-height: 100vh;">
+            <p style="width: 100%; max-width: 800px; text-align: center; margin: 0 auto 30px auto;">
+                <span class="label" style="text-align: center;">MODULE_03 // CHAIN_REACTION</span>
+                <span class="module-desc" style="text-align: center; display: block; margin: 0 auto 10px auto;">Tracking environmental cascading factors from source origin to urban containment.</span>
+                <span class="full-width-desc" style="display: block; margin-bottom: 0; text-align: center;">
+                    Pollution is rarely localized to its point of origin. Natural wind patterns, chemical reactions, and atmospheric conditions turn isolated emissions into wide-reaching regional hazards through predictable cascading progressions.
+                </span>
+            </p>
+
+            <div style="max-width: 800px; border-left: 2px solid var(--accent); padding-left: 40px; width: 100%;">
+
+                <div class="pipeline-group">
+                    <h2 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--accent);">01 // The Sumatra-to-Cities Pipeline</h2>
+                    <p style="color:#888; font-size: 1rem; line-height: 1.6;">
+                        Land clearing fires in Indonesia ignite peat soil. Due to the <strong>Monsoon Cycle</strong>, these winds push particulates across the ocean. Once they hit urban centers, <strong>Thermal Inversion</strong> traps them between skyscrapers, creating a permanent toxic ceiling.
+                    </p>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 01 // IGNITION</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Peatland Clearance</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Drainage channels lower water tables, turning carbon-dense peatlands into tinderboxes. Uncontrolled surface burns sink deep underground, initiating slow-burning, high-emission fires.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_9" alt="Peat Smoke" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 02 // TRANSPORT</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Monsoon Wind Currents</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Seasonal wind currents act as a highway for airborne toxins. Mass particulate plumes travel hundreds of miles over open water without dispersing.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_7" alt="Monsoon Winds" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 03 // TRAPPING</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Thermal Inversion Layer</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                A warm layer of air settles over the city like a dense lid. Normal vertical air circulation collapses, trapping toxic concentrations directly over streets.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_1" alt="Thermal Inversion" class="expanded-image">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-group">
+                    <h2 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--accent);">02 // The Solar Ozone Feedback Cascade</h2>
+                    <p style="color:#888; font-size: 1rem; line-height: 1.6;">
+                        Urban traffic emissions release <strong>NOx</strong> and <strong>VOCs</strong> during morning rush hours. Intense mid-day solar radiation triggers photochemical reactions that create <strong>Ground-Level Ozone</strong>, aggravating summer heat domes and respiratory emergency visits.
+                    </p>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 01 // PRECURSORS</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Morning Rush-Hour Exhaust</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Millions of combustion engines release massive volumes of nitrogen dioxide and volatile organic hydrocarbons into urban basins during peak morning commutes.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_1" alt="Urban Rush Hour Emissions" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 02 // PHOTO-OXIDATION</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Solar UV Activation</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                High noon ultraviolet light splits oxygen molecules and binds them with unburned hydrocarbons, accelerating secondary tropospheric ozone creation.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_3" alt="Solar Photochemical Reaction" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 03 // HEAT DOME</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Stagnant Urban Ozone Blanket</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Ground-level ozone locks heat near pavement, triggering regional air quality emergency warnings and acute asthma hospitalizations.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_8" alt="Urban Photochemical Smog" class="expanded-image">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-group">
+                    <h2 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--accent);">03 // Industrial Vapor-to-Acid Rain Cycle</h2>
+                    <p style="color:#888; font-size: 1rem; line-height: 1.6;">
+                        Coal plant stacks release sulfur dioxide and nitrogen oxides into upper cloud layers. Atmospheric moisture converts these gases into acidic precipitation, destroying downstream forest ecosystems and agricultural soils.
+                    </p>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 01 // SMOKESTACK VENTING</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Sulfur Oxide Discharge</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                High-volume coal plants and smelters dump tons of SO2 into high-altitude air streams without sufficient scrubber filtration.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_2" alt="Industrial Stack Venting" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 02 // CONDENSATION</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Sulfuric Hydration in Clouds</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Airborne water vapor reacts with gaseous oxides, transforming cloud moisture into dilute sulfuric and nitric acid solutions.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_4" alt="Acid Moisture Cloud Formation" class="expanded-image">
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <span class="label" style="margin: 0;">STEP 03 // PRECIPITATION</span>
+                        <h4 style="font-size: 1.1rem; color: #fff; margin-top: 5px;">Acid Rainfall & Ecosystem Leaching</h4>
+                        <div class="expanded-content">
+                            <div class="expanded-text">
+                                Low-pH rainfall strip soil of essential nutrients, corrodes civic infrastructure, and acidifies freshwater aquatic environments.
+                            </div>
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/9133275431068340538_5" alt="Acid Precipitation Impact" class="expanded-image">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="call-to-action-text">Want to stop this? You Can! <a href="solutions.html">Here's How.</a></p>
+            <footer>© 2026 NEBULA TRADEMARK // ALL RIGHTS RESERVED</footer>
+        </section>
+    </div>
+
+    <script>
+        // Custom Cursor Movement
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        window.addEventListener('mousemove', (e) => {
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+            outline.style.left = e.clientX - 16 + 'px';
+            outline.style.top = e.clientY - 16 + 'px';
+        });
+
+        // Toggle card focus & resize animations for grid modules
+        document.querySelectorAll('.scanner-box').forEach(box => {
+            box.addEventListener('click', () => {
+                const currentGrid = box.closest('.scanner-grid');
+                const isAlreadyExpanded = box.classList.contains('expanded');
+
+                // Clear current active state from all boxes in this grid
+                currentGrid.querySelectorAll('.scanner-box').forEach(b => b.classList.remove('expanded'));
+
+                if (!isAlreadyExpanded) {
+                    box.classList.add('expanded');
+                    currentGrid.classList.add('has-active');
+                } else {
+                    currentGrid.classList.remove('has-active');
+                }
+            });
+        });
+
+        // Toggle expand/shrink for pipeline steps in Module 03
+        document.querySelectorAll('.pipeline-step').forEach(step => {
+            step.addEventListener('click', () => {
+                step.classList.toggle('expanded');
+            });
+        });
+
+        function checkAuthState() {
+            const authNavBtn = document.getElementById('authNavBtn');
+            const activeUser = localStorage.getItem('nebula_active_user');
+            if (activeUser) {
+                authNavBtn.textContent = `[ ${activeUser.toUpperCase()} ]`;
+                authNavBtn.href = '#';
+                authNavBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (confirm("Disconnect session terminal?")) {
+                        localStorage.removeItem('nebula_active_user');
+                        checkAuthState();
+                    }
+                };
+            } else {
+                authNavBtn.textContent = 'LOGIN';
+                authNavBtn.href = 'login.html?return=origins.html';
+                authNavBtn.onclick = null;
+            }
+        }
+        checkAuthState();
+    </script>
+    
+</body>
+</html>
+

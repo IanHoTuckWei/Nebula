@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEBULA | Atmospheric Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --accent: #10b981; 
+            --danger: #ef4444;
+            --bg-dark: #0a0a0c;
+            --line-gray: rgba(255, 255, 255, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { cursor: none !important; }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #07131e 0%, #0a0e14 45%, #051d18 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- HIGHEST Z-INDEX CURSOR --- */
+        .cursor-dot {
+            width: 8px; height: 8px; background: var(--accent);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200001;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200000; transition: transform 0.15s ease-out;
+            transform: translate(-50%, -50%);
+        }
+
+        /* --- GLOBAL NAVIGATION --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.8rem 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: white; 
+        }
+        .nav-logo {
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; align-items: center; gap: 2rem; }
+        .nav-links a { 
+            text-decoration: none; 
+            color: #888; 
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            transition: color 0.2s ease; 
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: var(--accent); }
+
+        .auth-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer !important;
+        }
+        .auth-btn:hover {
+            background: var(--accent);
+            color: #000 !important;
+        }
+
+        /* CONTENT SECTION LAYOUT */
+        main {
+            flex: 1;
+            width: 100%;
+            padding: 140px 8% 80px 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* TITLE CARD */
+        .title-card {
+            text-align: center;
+            margin-bottom: 70px;
+            width: 100%;
+        }
+
+        .tag-label {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 15px;
+        }
+
+        .header-desc {
+            max-width: 700px;
+            margin: 0 auto;
+            color: #a1a1aa;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* MAIN CATEGORY SECTIONS */
+        .main-category {
+            width: 100%;
+            margin-bottom: 90px;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 40px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .main-title::before {
+            content: '//';
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        /* SUB-ITEM CONTAINERS */
+        .sub-method {
+            width: 100%;
+            margin-bottom: 65px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--line-gray);
+            border-radius: 16px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s ease;
+        }
+
+        .sub-method:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .sub-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sub-title-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .full-width-text {
+            width: 100%;
+            font-size: 1.05rem;
+            color: #a1a1aa;
+            line-height: 1.85;
+            margin-bottom: 25px;
+            text-align: justify;
+        }
+
+        .full-width-text strong {
+            color: #ffffff;
+        }
+
+        /* THREE PICTURE GRID */
+        .image-grid-three {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .method-image-box {
+            width: 100%;
+            height: 240px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--line-gray);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer; /* Signal clickability */
+        }
+
+        .method-image-box:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .method-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+
+        .method-image-box:hover img {
+            transform: scale(1.03);
+            filter: brightness(1);
+        }
+
+        /* Overlay text hidden by default */
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.5px;
+            width: 80%;
+        }
+
+        /* Darkening overlay hidden by default */
+        .method-image-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0); /* Invisible initially */
+            transition: background-color 0.4s ease;
+            z-index: 5;
+        }
+
+        /* Active state for clicked images */
+        .method-image-box.active img {
+            filter: brightness(0.2) blur(2px); /* Darken & slightly blur image */
+        }
+
+        .method-image-box.active::before {
+            background-color: rgba(0, 0, 0, 0.7); /* Visible dark overlay */
+        }
+
+        .method-image-box.active .overlay-text {
+            opacity: 1; /* Show text */
+        }
+
+        .img-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            z-index: 20; /* Keep caption above dark overlay */
+            transition: opacity 0.4s ease;
+        }
+
+        /* Hide caption in active state */
+        .method-image-box.active .img-caption {
+            opacity: 0;
+        }
+
+        /* CALL TO ACTION SECTION */
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 40px 20px;
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px dashed rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+        }
+
+        .cta-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .cta-link {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 6px;
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .cta-link:hover {
+            color: #ffffff;
+            opacity: 0.9;
+        }
+
+        /* FOOTER */
+        footer { 
+            position: relative;
+            padding: 80px 0; 
+            text-align: center; 
+            border-top: 1px solid var(--line-gray); 
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">NEBULA</a>
+        <div class="nav-links">
+            <a href="origins.html">Origins</a>
+            <a href="solutions.html" class="active">Solutions</a>
+            <a href="history.html">History</a>
+            <a href="features.html">Features</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="events.html">Events</a>
+            <a href="login.html?return=solutions.html" class="auth-btn" id="authNavBtn">LOGIN</a>
+        </div>
+    </nav>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <main id="main-content">
+
+        <div class="title-card">
+            <span class="tag-label">[ STRATEGY // MODULE_02 ]</span>
+            <h1>Solutions</h1>
+            <p class="header-desc">A comprehensive roadmap addressing atmospheric degradation across government policy, community action, and individual protection.</p>
+        </div>
+
+        <section class="main-category">
+            <h2 class="main-title">Government</h2>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">01.1</span>
+                    Transboundary Legal Enforcement & Treaties
+                </h3>
+                <p class="full-width-text">
+                    Cross-border air pollution cannot be contained by municipal boundaries or isolated law enforcement actions. Governing bodies across Southeast Asia and affected global regions must enact and rigorously enforce legally binding bilateral frameworks and regional pacts—most notably the ASEAN Agreement on Transboundary Haze Pollution. These legislative measures establish direct corporate and criminal liability for illegal land-clearing practices. By levying heavy economic sanctions, seizing commercial assets, and placing trade restrictions on agro-industrial conglomerates that utilize slash-and-burn tactics, governments create a strong financial disincentive against environmental destruction. Beyond penalties, these treaties establish international protocols for real-time intelligence sharing, emergency cross-border firefighting access, and diplomatic accountability during acute regional atmospheric crises.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80" alt="Legislative Policy Enforcement">
+                        <p class="overlay-text">International Treaties in Action</p>
+                        <div class="img-caption">// 01.1A : Statutory Enforcement Protocols</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" alt="International Cooperation">
+                        <p class="overlay-text">Global Data Exchange</p>
+                        <div class="img-caption">// 01.1B : Cross-Border Bilateral Summits</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80" alt="Legal Sanctions">
+                        <p class="overlay-text">Enforcing Corporate Fines</p>
+                        <div class="img-caption">// 01.1C : Corporate Liability Sanctions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">01.2</span>
+                    Satellite & AI Thermal Surveillance Networks
+                </h3>
+                <p class="full-width-text">
+                    Modern environmental protection relies heavily on advanced satellite telemetry integrated with artificial intelligence predictive algorithms. Orbital satellite constellations monitor vast tropical forest estates and remote agricultural sectors using multi-spectral sensors capable of penetrating cloud cover and dense atmospheric smoke. These systems detect thermal anomalies, infrared radiation signatures, and smoke plume drift vectors in real time. When illegal clearing or subterranean ignition occurs, machine learning platforms automatically cross-reference location coordinates with land concession maps to identify responsible entities. Automated emergency alerts are then dispatched directly to tactical forestry units, enabling ground crews and aerial water-bombers to extinguish localized outbreaks before they expand into uncontrollable regional haze events.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=600&q=80" alt="Thermal Satellite Tracking">
+                        <p class="overlay-text">Orbital Heat Detection</p>
+                        <div class="img-caption">// 01.2A : Orbital Infrared Telemetry</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="AI Data Analysis">
+                        <p class="overlay-text">Machine Learning Hotspot Analysis</p>
+                        <div class="img-caption">// 01.2B : Automated AI Hotspot Tracking</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=600&q=80" alt="Tactical Aerial Response">
+                        <p class="overlay-text">Water Bomber Deployment</p>
+                        <div class="img-caption">// 01.2C : Aerial Fire Suppression Dispatch</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">01.3</span>
+                    Peatland Hydrological Restoration Programs
+                </h3>
+                <p class="full-width-text">
+                    Peatlands are rich organic wetland ecosystems that, when drained for commercial monoculture farming, turn into hyper-flammable fuel sources capable of smoldering underground for months. State-funded restoration programs address this vulnerability at its root by implementing large-scale hydrological management. Civil engineering initiatives build thousands of canal blocks across drained peat domes to raise subterranean water tables and re-wet dried soil beds. Simultaneously, governments enforce strict conservation zoning laws that ban further drainage projects and fund indigenous revegetation schemes. By maintaining high soil moisture levels, these environmental restoration initiatives eliminate the risk of subterranean fires while preserving crucial terrestrial carbon reservoirs.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" alt="Peatland Protection">
+                        <p class="overlay-text">Peat Soil Re-wetting</p>
+                        <div class="img-caption">// 01.3A : Hydrological Re-wetting Schemes</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80" alt="Canal Blocking">
+                        <p class="overlay-text">Blocking Drainage Canals</p>
+                        <div class="img-caption">// 01.3B : Canal Blockade Engineering</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1511497584788-876761c11969?auto=format&fit=crop&w=600&q=80" alt="Revegetation Project">
+                        <p class="overlay-text">Mangrove & Wetland Replanting</p>
+                        <div class="img-caption">// 01.3C : Wetland Revegetation Reserves</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="main-category">
+            <h2 class="main-title">Community</h2>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">02.1</span>
+                    Decentralized IoT Air Quality Sensor Networks
+                </h3>
+                <p class="full-width-text">
+                    While central government air monitoring stations offer high-precision regional data, they are often sparse and fail to capture localized pollution spikes caused by micro-climate variations or nearby agricultural burning. Community-led initiatives overcome this limitation by deploying dense networks of open-source IoT (Internet of Things) optical particle sensors across suburban neighborhoods, school districts, and agricultural perimeters. These compact nodes measure real-time fluctuations in PM2.5, PM10, carbon monoxide, and volatile organic compounds. Data is streamed continuously to open public platforms, providing residents, local health workers, and school administrators with instant alerts to make informed decisions regarding outdoor activities and mask requirements.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=600&q=80" alt="Community Sensor Networks">
+                        <p class="overlay-text">Localized Sensor Grid Deployment</p>
+                        <div class="img-caption">// 02.1A : Micro-Sensor Grid Deployment</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Public Telemetry Dashboard">
+                        <p class="overlay-text">Live Air Quality Map</p>
+                        <div class="img-caption">// 02.1B : Real-Time Open Data Streams</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Digital Hardware Integration">
+                        <p class="overlay-text">Microcontroller Programming</p>
+                        <div class="img-caption">// 02.1C : Localized IoT Telemetry Modules</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">02.2</span>
+                    Volunteer Ground-Response Fire Brigades
+                </h3>
+                <p class="full-width-text">
+                    In rural and fire-prone regions, official emergency services may take hours to reach remote agricultural sectors. Grassroots volunteer fire response units (Masyarakat Peduli Api) fill this vital gap by serving as local first responders. Community members undergo rigorous training in wildland fire suppression techniques, peatland hydration tactics, and safety protocols. Local communities pool resources to acquire portable high-pressure water pumps, fire-retardant foam, and handheld thermal imaging equipment. Operating regular perimeter patrols during dry spells, these volunteer crews locate and extinguish minor grass fires and smoldering brush before flames penetrate deep into flammable subsoil layers.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80" alt="Volunteer Action">
+                        <p class="overlay-text">Community Fire Drills</p>
+                        <div class="img-caption">// 02.2A : First-Responder Patrol Units</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80" alt="Community Training">
+                        <p class="overlay-text">Suppressing Peat Smolder</p>
+                        <div class="img-caption">// 02.2B : Rural Suppression Drills</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80" alt="Equipment Maintenance">
+                        <p class="overlay-text">Pumps & Protective Gear</p>
+                        <div class="img-caption">// 02.2C : Portable Suppression Logistics</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">02.3</span>
+                    Public Clean-Air Refuges & Educational Hubs
+                </h3>
+                <p class="full-width-text">
+                    During peak transboundary haze events, indoor air in non-air-conditioned homes can reach hazardous pollution levels. Municipal communities combat this health threat by retrofitting public facilities—such as libraries, community halls, and athletic centers—into positive-pressure clean-air shelters. These hubs are equipped with high-capacity industrial HEPA air scrubbing units, sealing air locks, and real-time indoor air monitors. They provide immediate safe havens for high-risk individuals, including the elderly, young children, pregnant women, and people with pre-existing respiratory illnesses. Additionally, these centers act as distribution nodes for N95 masks, medical aid, and workshops teaching sustainable, non-burning land clearing methods to smallholder farmers.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=600&q=80" alt="Clean Air Refuges">
+                        <p class="overlay-text">Filtered Air Shelter Zone</p>
+                        <div class="img-caption">// 02.3A : HEPA-Filtered Public Architecture</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" alt="Medical Distribution">
+                        <p class="overlay-text">N95 Mask Distribution Point</p>
+                        <div class="img-caption">// 02.3B : Emergency Respiratory Relief</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80" alt="Community Workshops">
+                        <p class="overlay-text">Teaching Sustainable Farming</p>
+                        <div class="img-caption">// 02.3C : Sustainable Land-Use Seminars</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="main-category">
+            <h2 class="main-title">Ones You Can Do!</h2>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">03.1</span>
+                    Indoor Air Purification & Envelope Sealing
+                </h3>
+                <p class="full-width-text">
+                    Protecting personal health during prolonged environmental haze requires creating a secure indoor sanctuary free from fine particulate matter (PM2.5). Individuals can achieve this by installing HEPA (High-Efficiency Particulate Air) purifiers capable of trapping airborne soot, combustion particles, and bio-aerosols down to 0.3 microns. To maximize purification efficiency, residents should seal building envelope leaks by applying weather-stripping foam tape along window frames, placing draft stoppers under doors, and temporarily closing exterior fresh-air vents. Supplementing mechanical filtration with indoor air-purifying plants—such as Snake Plants and Peace Lilies—further helps reduce indoor volatile organic compounds, ensuring safe indoor air quality when outdoor conditions reach hazardous levels.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1584634731339-252c581abfc5?auto=format&fit=crop&w=600&q=80" alt="HEPA Air Purification">
+                        <p class="overlay-text">Portable HEPA Filtration Unit</p>
+                        <div class="img-caption">// 03.1A : High-Efficiency HEPA Scrubbing</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="Sealing Building Drafts">
+                        <p class="overlay-text">Sealing Window Cracks</p>
+                        <div class="img-caption">// 03.1B : Residential Envelope Sealing</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80" alt="Botanical Filtration">
+                        <p class="overlay-text">Snake Plants & Ferns</p>
+                        <div class="img-caption">// 03.1C : Indoor Botanical Air Filtration</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">03.2</span>
+                    Personal Respiratory Protection & AQI Tracking
+                </h3>
+                <p class="full-width-text">
+                    When outdoor activity is unavoidable during severe haze episodes, standard surgical or cloth masks are insufficient because microscopic PM2.5 particles easily pass through loose weaves and gaps. Individuals must rely on certified N95, KN95, or FFP2 respirators, which feature electrostatically charged micro-fibers and form a tight seal against the face to filter out at least 95% of airborne particulates. Personal protection also involves proactive scheduling: by monitoring real-time Air Quality Index (AQI) smartphone applications and satellite forecast tools, residents can identify periods of lower pollution to commute or run essential errands, while avoiding outdoor physical exertion during peak smog hours.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&w=600&q=80" alt="Personal PPE Protection">
+                        <p class="overlay-text">Proper N95 Fitment</p>
+                        <div class="img-caption">// 03.2A : Certified N95 Facial Seals</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80" alt="Mobile AQI Tracking">
+                        <p class="overlay-text">Checking Local AQI Levels</p>
+                        <div class="img-caption">// 03.2B : Real-Time AQI App Tracking</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80" alt="Low Exposure Travel">
+                        <p class="overlay-text">Exercising During Low Polution</p>
+                        <div class="img-caption">// 03.2C : Low-Exposure Activity Planning</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-method">
+                <h3 class="sub-title">
+                    <span class="sub-title-tag">03.3</span>
+                    Conscious Consumer Choice & RSPO Support
+                </h3>
+                <p class="full-width-text">
+                    Individual market choices aggregate into powerful economic pressure that shapes global supply chains. A major driver of agricultural fires is cheap land clearance for palm oil, timber, and paper production. Consumers can take direct action by auditing their daily purchases and exclusively supporting brands certified by the Roundtable on Sustainable Palm Oil (RSPO) or the Forest Stewardship Council (FSC). These certifications ensure that commodities are produced without deforestation, peatland destruction, or open burning practices. By actively boycotting uncertified agricultural suppliers and advocating for transparent corporate sustainability reporting, consumers force commercial growers to adopt zero-burn mechanical land clearing methods instead of fire.
+                </p>
+                <div class="image-grid-three">
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=600&q=80" alt="Conscious Consumer Choices">
+                        <p class="overlay-text">Auditing Sourcing Certification</p>
+                        <div class="img-caption">// 03.3A : Sustainable Product Auditing</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80" alt="Zero-Deforestation Support">
+                        <p class="overlay-text">Certified Sustainable Palm Oil</p>
+                        <div class="img-caption">// 03.3B : RSPO / FSC Eco-Certification</div>
+                    </div>
+                    <div class="method-image-box">
+                        <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80" alt="Ethical Market Advocacy">
+                        <div class="img-caption">// 03.3C : Supply Chain Transparency Advocacy</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="cta-section">
+            <p class="cta-text">Think you know what to do now? Go and <a href="events.html" class="cta-link">try with others</a>!</p>
+        </div>
+
+    </main>
+
+    <footer id="pageFooter">
+        <p style="font-family: 'JetBrains Mono'; color: #FFF; font-size: 0.8rem; letter-spacing: 2px;">
+            © 2026 NEBULA TRADEMARK // ALL RIGHTS RESERVED
+        </p>
+    </footer>
+
+    <script>
+        /* --- Cursor Following --- */
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        window.addEventListener('mousemove', (e) => {
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+            outline.style.left = e.clientX + 'px';
+            outline.style.top = e.clientY + 'px';
+        });
+
+        /* --- Click Interaction for Images --- */
+        document.querySelectorAll('.method-image-box').forEach(box => {
+            // Mouseenter/leave for cursor effect
+            box.addEventListener('mouseenter', () => outline.style.transform = 'translate(-50%, -50%) scale(1.5)');
+            box.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
+            
+            // Click to toggle active state (darken & show text)
+            box.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Mouseenter/leave for other links
+        document.querySelectorAll('a').forEach(el => {
+            el.addEventListener('mouseenter', () => outline.style.transform = 'translate(-50%, -50%) scale(1.5)');
+            el.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
+        });
+
+        function checkAuthState() {
+            const authNavBtn = document.getElementById('authNavBtn');
+            const activeUser = localStorage.getItem('nebula_active_user');
+            if (activeUser) {
+                authNavBtn.textContent = `[ ${activeUser.toUpperCase()} ]`;
+                authNavBtn.href = '#';
+                authNavBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (confirm("Disconnect session terminal?")) {
+                        localStorage.removeItem('nebula_active_user');
+                        checkAuthState();
+                    }
+                };
+            } else {
+                authNavBtn.textContent = 'LOGIN';
+                authNavBtn.href = 'login.html?return=solutions.html';
+                authNavBtn.onclick = null;
+            }
+        }
+        checkAuthState();
+    </script>
+</body>
+</html>

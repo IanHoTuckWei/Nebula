@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEBULA | Access Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #10b981; --bg-dark: #0a0a0c; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { cursor: none !important; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #bubble-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cursor-dot {
+            width: 8px; height: 8px; background: var(--accent);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200001;
+        }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 2px solid rgba(16, 185, 129, 0.5);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 200000; transition: transform 0.15s ease-out;
+        }
+
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 2rem 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            color: white;
+        }
+        .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+        nav a { text-decoration: none; color: inherit; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; transition: opacity 0.2s; }
+        nav a:hover { opacity: 0.7; }
+
+        .auth-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover {
+            background: var(--accent);
+            color: #000 !important;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 120px 8% 80px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-card {
+            background: #0f0f12;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            color: #fff;
+            text-align: left;
+        }
+
+        .auth-header { margin-bottom: 25px; }
+        .auth-header h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; }
+        .auth-header p { font-size: 0.85rem; margin-top: 0; color: #888; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .form-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 18px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus { border-color: var(--accent); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+            margin-top: 10px;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .auth-toggle span {
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer !important;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bubble-canvas"></canvas>
+
+    <nav>
+        <a href="index.html" style="font-weight: 900; letter-spacing: 3px; text-decoration: none; color: inherit;">NEBULA</a>
+        <div class="nav-links">
+            <a href="origins.html">Origins</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="history.html">History</a>
+            <a href="features.html">Features</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="events.html">Events</a>
+            <a href="login.html?return=login.html" class="auth-btn" id="authNavBtn">LOGIN</a>
+        </div>
+    </nav>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <main class="login-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h3 id="modalTitle">Access Terminal</h3>
+                <p id="modalSub">Enter your email and password to authenticate your NEBULA session.</p>
+            </div>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="you@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Passcode</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">Authenticate</button>
+            </form>
+            <div class="auth-toggle">
+                <p><span id="toggleText">Need credentials?</span> <span id="toggleAuthMode">Register Clearance</span></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        window.addEventListener('mousemove', (e) => {
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+            outline.style.left = e.clientX - 16 + 'px';
+            outline.style.top = e.clientY - 16 + 'px';
+        });
+        document.querySelectorAll('a, button, input, #toggleAuthMode').forEach(el => {
+            el.addEventListener('mouseenter', () => outline.style.transform = 'scale(1.5)');
+            el.addEventListener('mouseleave', () => outline.style.transform = 'scale(1)');
+        });
+
+        const canvas = document.getElementById('bubble-canvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Bubble {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 20;
+                this.radius = Math.random() * 12 + 4;
+                this.speed = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = Math.random() * 0.03 + 0.01;
+            }
+            update() {
+                this.y -= this.speed;
+                this.wobble += this.wobbleSpeed;
+                this.x += Math.sin(this.wobble) * 0.5;
+                if (this.y < -this.radius) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(16, 185, 129, ${this.opacity})`;
+                ctx.strokeStyle = `rgba(16, 185, 129, ${this.opacity + 0.2})`;
+                ctx.lineWidth = 1;
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        const bubbles = Array.from({ length: 40 }, () => new Bubble());
+        function animateBubbles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bubbles.forEach(b => { b.update(); b.draw(); });
+            requestAnimationFrame(animateBubbles);
+        }
+        animateBubbles();
+
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('return') || 'index.html';
+
+        function getAccounts() {
+            return JSON.parse(localStorage.getItem('nebula_accounts') || '{}');
+        }
+
+        function saveAccounts(accounts) {
+            localStorage.setItem('nebula_accounts', JSON.stringify(accounts));
+        }
+
+        const authForm = document.getElementById('authForm');
+        const toggleAuthMode = document.getElementById('toggleAuthMode');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSub = document.getElementById('modalSub');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleText = document.getElementById('toggleText');
+        const authNavBtn = document.getElementById('authNavBtn');
+
+        let isLoginState = params.get('mode') !== 'register';
+
+        function applyAuthModeUI() {
+            if (isLoginState) {
+                modalTitle.textContent = "Access Terminal";
+                modalSub.textContent = "Enter your email and password to authenticate your NEBULA session.";
+                submitBtn.textContent = "Authenticate";
+                toggleText.textContent = "Need credentials?";
+                toggleAuthMode.textContent = "Register Clearance";
+            } else {
+                modalTitle.textContent = "Create Clearance";
+                modalSub.textContent = "Register new operator protocol credentials.";
+                submitBtn.textContent = "Register";
+                toggleText.textContent = "Have access?";
+                toggleAuthMode.textContent = "Login Terminal";
+            }
+        }
+
+        function checkAuthState() {
+            const activeUser = localStorage.getItem('nebula_active_user');
+            if (activeUser) {
+                authNavBtn.textContent = `[ ${activeUser.toUpperCase()} ]`;
+                authNavBtn.href = '#';
+                authNavBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (confirm("Disconnect session terminal?")) {
+                        localStorage.removeItem('nebula_active_user');
+                        checkAuthState();
+                    }
+                };
+            } else {
+                authNavBtn.textContent = "LOGIN";
+                authNavBtn.href = `login.html?return=${encodeURIComponent(returnUrl)}`;
+                authNavBtn.onclick = null;
+            }
+        }
+
+        toggleAuthMode.addEventListener('click', () => {
+            isLoginState = !isLoginState;
+            applyAuthModeUI();
+        });
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const pass = document.getElementById('password').value;
+            const accounts = getAccounts();
+
+            if (isLoginState) {
+                if (!accounts[email]) {
+                    alert("Account not found. Please create an account through Register Clearance first.");
+                    isLoginState = false;
+                    applyAuthModeUI();
+                    return;
+                }
+                if (accounts[email] !== pass) {
+                    alert("Invalid passcode. Please try again.");
+                    return;
+                }
+                localStorage.setItem('nebula_active_user', email);
+                alert(`Authentication Successful. Welcome Operator ${email}.`);
+            } else {
+                if (accounts[email]) {
+                    alert("An account with this email already exists. Please log in instead.");
+                    isLoginState = true;
+                    applyAuthModeUI();
+                    return;
+                }
+                accounts[email] = pass;
+                saveAccounts(accounts);
+                localStorage.setItem('nebula_active_user', email);
+                alert(`Clearance Granted. Account created for Operator ${email}.`);
+            }
+
+            authForm.reset();
+            window.location.href = returnUrl;
+        });
+
+        applyAuthModeUI();
+        checkAuthState();
+    </script>
+</body>
+</html>
