@@ -378,6 +378,70 @@
             0%, 100% { opacity: 0.25; }
             50% { opacity: 0.65; }
         }
+        @media (hover: none), (pointer: coarse) {
+            .cursor-dot,
+            .cursor-outline {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+                flex-direction: column;
+                gap: 0.9rem;
+                mix-blend-mode: normal;
+                background: rgba(0, 0, 0, 0.84);
+                backdrop-filter: blur(14px);
+            }
+            .nav-links {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.75rem 1rem;
+            }
+            nav a {
+                font-size: 0.72rem;
+            }
+            section {
+                padding: 150px 5% 70px;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .bento {
+                gap: 24px;
+            }
+            .bento-card {
+                max-width: none;
+                padding: 24px 20px;
+            }
+            .bento-card:nth-child(odd),
+            .bento-card:nth-child(even) {
+                align-self: stretch;
+                text-align: left;
+            }
+            .bento-card:nth-child(even) h3 {
+                text-align: left;
+            }
+            .hub-grid {
+                grid-template-columns: 1fr;
+            }
+            .hub-card {
+                padding: 28px 22px;
+            }
+            .nebula-loader-logo {
+                letter-spacing: 8px;
+                padding-left: 8px;
+            }
+            .nebula-loader-orbit {
+                width: 180px;
+                height: 180px;
+            }
+            .nebula-loader-orbit.ring-2 {
+                width: 250px;
+                height: 250px;
+            }
+        }
     </style>
 </head>
 <body>

@@ -1254,6 +1254,115 @@
             .pokedex-grid { grid-template-columns: 1fr; }
             .lb-row { grid-template-columns: 50px 1fr 100px 120px; padding: 12px 14px; }
         }
+        @media (hover: none), (pointer: coarse) {
+            .cursor-dot,
+            .cursor-outline {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+                flex-direction: column;
+                gap: 0.9rem;
+            }
+            .nav-links {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.75rem 1rem;
+            }
+            #auth-gate-overlay {
+                top: 120px;
+            }
+            .app-container {
+                display: block;
+                margin-top: 120px;
+                min-height: auto;
+                padding-bottom: 140px;
+            }
+            .sidebar {
+                position: static;
+                width: auto;
+                top: auto;
+                bottom: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px 16px;
+            }
+            .exp-hud-container {
+                position: static;
+                bottom: auto;
+                left: auto;
+                width: 100%;
+                max-width: none;
+                margin-top: 18px;
+            }
+            .level-mascot {
+                height: 220px;
+            }
+            .content-area {
+                margin-left: 0;
+                width: 100%;
+                max-width: none;
+                padding: 24px 5% 32px;
+            }
+            .filter-panel,
+            .target-time-wrapper,
+            .time-select-row,
+            .quiz-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .time-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .time-select {
+                flex: 1;
+            }
+            .calendar-dropdown {
+                width: min(94vw, 360px);
+                padding: 16px;
+            }
+            .events-grid,
+            .pokedex-grid,
+            .terramon-grid {
+                grid-template-columns: 1fr;
+            }
+            .leaderboard-table-container {
+                overflow-x: auto;
+            }
+            .lb-toggle-row {
+                flex-wrap: wrap;
+            }
+            .lb-row {
+                min-width: 560px;
+            }
+            .user-rank-sticky-bar {
+                left: 0;
+                padding: 12px 14px;
+                gap: 12px;
+                justify-content: flex-start;
+            }
+            .rank-bar-section {
+                min-width: calc(50% - 12px);
+            }
+            .rank-divider {
+                display: none;
+            }
+            .modal-card {
+                width: 94%;
+                padding: 24px 18px;
+            }
+            .attendee-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
