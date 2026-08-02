@@ -28,7 +28,7 @@
             justify-content: space-between;
         }
 
-        /* --- CUSTOM CURSOR --- */
+        /* neon cursor */
         .cursor-dot {
             width: 8px; height: 8px; background: var(--accent);
             position: fixed; border-radius: 50%; pointer-events: none;
@@ -92,7 +92,7 @@
             color: #000 !important;
         }
 
-        /* --- SECTION LAYOUT --- */
+        /* section layout */
         section {
             padding: 140px 8% 80px 8%;
             width: 100%;
@@ -103,7 +103,7 @@
         h1 { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -2px; line-height: 1.1; margin-top: 10px; margin-bottom: 20px; }
         p.subtitle { max-width: 700px; font-size: 1.1rem; color: #a1a1aa; line-height: 1.6; }
 
-        /* --- QUIZ CARD STYLING --- */
+        /* quiz card style */
         .quiz-card {
             background: rgba(13, 13, 13, 0.75);
             border: 1px solid var(--border-color);
@@ -324,7 +324,7 @@
     </footer>
 
     <script>
-        /* --- Custom Cursor Tracking --- */
+        /* cursor movement */
         const dot = document.querySelector('.cursor-dot');
         const outline = document.querySelector('.cursor-outline');
 
@@ -350,7 +350,7 @@
             el.addEventListener('mouseleave', () => outline.style.transform = 'translate(-50%, -50%) scale(1)');
         });
 
-        /* --- Quiz Data & State Engine --- */
+        /* quiz data and state engine */
         const quizData = [
             {
                 question: "In what year did the Great Haze, Southeast Asia's worst environmental disaster, occur?",
